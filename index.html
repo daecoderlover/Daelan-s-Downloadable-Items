@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daelan's Downloadable Website</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <svg class="logo-icon" viewBox="0 0 40 40" fill="none">
+                    <path d="M12 8L20 4L28 8L28 32L20 36L12 32L12 8Z" fill="#3B82F6" opacity="0.9"/>
+                    <path d="M20 4L20 36" stroke="#93C5FD" stroke-width="2"/>
+                    <path d="M12 20L28 20" stroke="#93C5FD" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-name">Daelan's</span>
+                    <span class="logo-tag">Downloadable Website</span>
+                </div>
+            </a>
+
+            <div class="nav-links">
+                <a href="#" class="nav-link active">Home</a>
+                <a href="#" class="nav-link">Upload</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="categories-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    Categories
+                </button>
+                <button class="my-downloads-btn">My Downloads</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">Creating Things for<br>Everyone to Download</h1>
+        <div class="search-bar">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" placeholder="Search for Downloadable Items" id="search-input">
+        </div>
+    </section>
+
+    <!-- Items Grid -->
+    <section class="items-section">
+        <div class="grid-container" id="items-grid">
+            <!-- Items loaded by JavaScript -->
+        </div>
+    </section>
+
+</body>
+<script src="script.js"></script>
+</html>
