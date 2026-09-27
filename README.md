@@ -38,7 +38,8 @@ Go to  **Issues** to submit files — read the rules, then send your files throu
 - **HTML** - Do not include malicious things such as <script></script>, <iframe></iframe>, etc.
 - **CSS** - Safe
 - **DAEX & DAE** - I Will rename it to zip to see contents of DAEX and DAE, which are actually archives
-- **Images, Videos & Documents** - Must NOT include Macros nor inappropriate contents
+- **Images, Videos & Documents** - Must NOT include Macros nor inappropriate contents because some kids can use Github like me
+- 
 
 ---
 
