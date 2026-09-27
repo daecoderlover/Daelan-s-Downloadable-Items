@@ -1,6 +1,6 @@
 # 📦 Daelan's Downloadable Items
 
-Welcome to my official download hub! Here I share projects, tools, and files I've created — all checked and safe for everyone.
+Welcome to my official download hub! Here I share projects, tools, and files I've created — all checked and safe for everyone. **Only Collaboraters can send feedback and issues**
 
 ---
 
