@@ -17,13 +17,13 @@ Every file is checked by me before publishing:
 - ✅ Renamed & inspected inside — no hidden surprises
 - ✅ Only approved file types accepted
 - ✅ HTML/CSS/JS reviewed line-by-line
-- ✅ No `.exe` `.dll` `.bat` macros or iframes
+- ✅ No `.exe` `.dll` `.bat` macros nor iframes
 - ✅ Content suitable for all ages
 
 ---
 
 ## 🔗 Visit My Site
-👉 **[Click Here](https://daecoderlover.github.io/Daelan-s-Downloadable-Items/)**
+👉 **[Click Here - Daelan's Downloadable Website](https://daecoderlover.github.io/Daelan-s-Downloadable-Items/)**
 
 ---
 
@@ -33,15 +33,15 @@ Go to  **Issues** to submit files — read the rules, then send your files throu
 - Add `// comments` or `# comments`to explain your code — it helps me approve faster!
 - Keep it clean, original, and suitable for everyone.
 - **Python** - Do not include things that open programs nor steal data, include details or the popular print and # comments only
-- **Javascript** - Same rules as phyton, only include details, console.log (that is safe) and // comments only
+- **Javascript** - Same rules as python, only include details, console.log (that must be safe) and // comments only
 - **JSON** - Can be in Javascript, 100% safe
 - **HTML** - Do not include malicious things such as <script></script>, <iframe></iframe>, etc.
-- **CSS** - Safe
+- **CSS** - Safe, this file is for looks only
 - **DAEX & DAE** - I Will rename it to zip to see contents of DAEX and DAE, which are actually archives
 - **Images, Videos & Documents** - Must NOT include Macros nor inappropriate contents because some kids can use Github like me
 
 ---
 
 ## © License
-MIT License — Copyright © 2026 daecoderlover
+**MIT License** — Copyright © 2026 daecoderlover
 Free to use & share with credit given.
