@@ -1,6 +1,6 @@
 // === DAELAN'S DOWNLOADABLE WEBSITE — JAVASCRIPT ===
 // File safety rules — blocks dangerous extensions
-const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.ps1', '.vbs', '.js', '.jse', '.wsf', 
+const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.ps1', '.vbs', '.jse', '.wsf', 
                             '.msi', '.reg', '.com', '.scr', '.hta', '.cpl', '.jar', '.app'];
 
 // Your downloadable items — add yours here!
