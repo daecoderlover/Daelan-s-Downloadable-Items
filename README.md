@@ -28,7 +28,7 @@ Every file is checked by me before publishing:
 ---
 
 ## 📤 Want to Submit Something?
-Go to  **Issues** to submit files — read the rules, then send your files through Issues!
+Go to  **Issues** or **Discusions** to submit files — read the rules, then send your files through Issues!
 - Approved types: `.py` `.js` `.json` `.html` `.css` `.daex` `.dae` + images/videos/PDFs
 - Add `// comments` or `# comments`to explain your code — it helps me approve faster!
 - Keep it clean, original, and suitable for everyone.
