@@ -29,7 +29,11 @@ def open_browser_file(filename):
     url = BROWSER_FILES.get(filename)
     if url:
         print(f"🌐 Opening {url} ...")
-        webbrowser.open(url)
+        if os.name == 'nt':
+    webbrowser.open(url)
+else:
+    os.system(f"termux-open-url '{url}'")
+    print("✅ Opening in your browser...")
         return True
     return False
 
