@@ -1,0 +1,24 @@
+{
+  "name": "Daelan's Downloadable Items",
+  "short_name": "Daelan Downloads",
+  "description": "Download packs, videos and resources including Tux‑adventure story assets",
+  "start_url": "./#",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2c3e50",
+  "icons": [
+    {
+      "src": "daelan.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "daelan_high.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
