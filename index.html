@@ -6,6 +6,15 @@
     <title>Daelan's Downloadable Website</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+    
+    <!-- PWA Manifest & Service Worker -->
+    <link rel="manifest" href="./manifest.json">
+    <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js")
+        .catch(err => console.error("Service worker failed:", err));
+    }
+    </script>
 </head>
 <body>
 
