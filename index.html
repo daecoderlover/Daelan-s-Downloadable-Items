@@ -60,6 +60,10 @@
             </svg>
             <input type="text" placeholder="Search for Downloadable Items" id="search-input">
         </div>
+        <!-- PWA Install Button -->
+        <button id="install-app-btn" style="display: none; margin-top: 16px; padding:12px 20px; font-size:16px;">
+          Install Daelan's Downloads App
+        </button>
     </section>
 
     <!-- Items Grid -->
@@ -69,6 +73,24 @@
         </div>
     </section>
 
+<script>
+let deferredInstallPrompt = null;
+const installButton = document.getElementById('install-app-btn');
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  installButton.style.display = 'block';
+});
+
+installButton.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const result = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installButton.style.display = 'none';
+});
+</script>
 </body>
 <script src="script.js"></script>
 </html>
