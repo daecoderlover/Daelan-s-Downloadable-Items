@@ -140,6 +140,26 @@ body {
     box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
 }
 
+/* === INSTALL PWA BUTTON === */
+#install-app-btn {
+    /* Kept hidden until prompt activates via your JavaScript */
+    display: none; 
+    
+    background: linear-gradient(90deg, #2563EB, #3B82F6);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#install-app-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
 /* === HERO === */
 .hero {
     text-align: center;
@@ -334,6 +354,6 @@ body {
 
 @media (max-width: 480px) {
     .nav-container { padding: 0 16px; }
-    .my-downloads-btn { padding: 8px 16px; font-size: 13px; }
+    .my-downloads-btn, #install-app-btn { padding: 8px 16px; font-size: 13px; }
     .grid-container { grid-template-columns: 1fr; }
 }
