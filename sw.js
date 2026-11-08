@@ -1,4 +1,4 @@
-const CACHE_NAME = "daelan‑downloads‑v1";
+const CACHE_NAME = "daelan‑downloads‑v1.1";
 const CORE_ASSETS = [
   "./",
   "./#",
