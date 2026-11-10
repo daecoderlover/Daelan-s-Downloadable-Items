@@ -1,7 +1,0 @@
-defaultConfig {
-    applicationId "io.github.daecoderlover.daelansdownloadableitems"
-    minSdkVersion 21
-    targetSdkVersion 34
-    versionCode 4       // Must match your structural update increments
-    versionName "1.2.2" // This exact string will now show up in Android App Info!
-}
