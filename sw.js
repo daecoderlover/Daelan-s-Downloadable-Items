@@ -1,4 +1,4 @@
-const CACHE_NAME = "daelan‑downloads‑v4";
+const CACHE_NAME = "v1.2.2-Hotfix";
 const CORE_ASSETS = [
   "./",
   "./#",
@@ -14,7 +14,7 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Activate: delete old outdated caches
+// Activate: delete old outdated caches and broadcast the new version
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -22,7 +22,18 @@ self.addEventListener("activate", (event) => {
         cacheNames.filter(name => name !== CACHE_NAME)
           .map(name => caches.delete(name))
       );
-    }).then(() => self.clients.claim())
+    })
+    .then(() => self.clients.claim())
+    .then(() => self.clients.matchAll({ type: "window" }))
+    .then(clients => {
+      // Loop through open app windows and send the new version tag
+      clients.forEach(client => {
+        client.postMessage({
+          type: "VERSION_UPDATE",
+          version: CACHE_NAME
+        });
+      });
+    })
   );
 });
 
