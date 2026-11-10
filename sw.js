@@ -1,4 +1,4 @@
-const CACHE_NAME = "v1.2.2-Hotfix";
+const CACHE_NAME = "v1.2.2-Hotfix-2";
 const CORE_ASSETS = [
   "./",
   "./#",
