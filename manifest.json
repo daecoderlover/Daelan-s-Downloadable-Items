@@ -7,7 +7,7 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2c3e50",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "icons": [
     {
       "src": "gem192.png",
