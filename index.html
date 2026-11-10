@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Google Search Console Verification -->
- <meta name="google-site-verification" content="og6FeBb6OchdvgFyNtK5Zou97V8IQocQrxjziH6Pafs" />
-    
+    <meta name="google-site-verification" content="og6FeBb6OchdvgFyNtK5Zou97V8IQocQrxjziH6Pafs" />
+
     <!-- Hides site from public Google search results -->
     <meta name="robots" content="noindex, nofollow" />
 
@@ -14,12 +14,48 @@
     <link rel="stylesheet" href="style.css">
     <link class="icon" type="image/png" href="gem192.png">
 
-    <!-- PWA Manifest & Service Worker -->
+    <!-- PWA Manifest & Service Worker Setup with Debug Hook -->
     <link rel="manifest" href="./manifest.json">
     <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js")
-        .catch(err => console.error("Service worker failed:", err));
+        .then((registration) => {
+          const statusEl = document.getElementById('debug-status');
+          if (!statusEl) return;
+          
+          // Show initial registration state in the debug panel
+          if (registration.installing) {
+            statusEl.innerText = "Downloading...";
+            statusEl.style.color = "#33b5e5";
+          } else if (registration.waiting) {
+            statusEl.innerText = "Update Ready";
+            statusEl.style.color = "#ffbb33";
+          } else if (registration.active) {
+            statusEl.innerText = "Running";
+            statusEl.style.color = "#00C851";
+          }
+        })
+        .catch(err => {
+          console.error("Service worker failed:", err);
+          const statusEl = document.getElementById('debug-status');
+          if (statusEl) {
+            statusEl.innerText = "Error";
+            statusEl.style.color = "#ff4444";
+          }
+        });
+
+      // Listen for the live update message from sw.js when cache cleans up
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'VERSION_UPDATE') {
+          // Instantly replace text with the new CACHE_NAME string
+          document.getElementById('debug-version').innerText = event.data.version;
+          
+          // Flash status green to indicate update complete
+          const statusEl = document.getElementById('debug-status');
+          statusEl.innerText = "Updated Live!";
+          statusEl.style.color = "#00ff00";
+        }
+      });
     }
     </script>
 </head>
@@ -29,7 +65,6 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="logo">
-                <!-- Replaced old SVG with your gem image tag -->
                 <img src="gem192.png" alt="Daelan's Diamond" class="logo-icon">
                 <div class="logo-text">
                     <span class="logo-name">Daelan's</span>
@@ -76,6 +111,12 @@
             <!-- Items loaded by JavaScript -->
         </div>
     </section>
+
+    <!-- Floating Debug Info Panel -->
+    <div id="debug-panel" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.85); color: #00ff00; font-family: monospace; font-size: 11px; padding: 8px 12px; border-radius: 5px; border: 1px solid #333; z-index: 9999; pointer-events: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+        [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.2.1 (Loaded)</span>
+    </div>
 
 <script>
 let deferredInstallPrompt = null;
