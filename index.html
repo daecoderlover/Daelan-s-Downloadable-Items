@@ -17,13 +17,22 @@
     <!-- PWA Manifest & Service Worker Setup with Debug Hook -->
     <link rel="manifest" href="./manifest.json">
     <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js")
+    if ('serviceWorker' in navigator) {
+      // 1. Instantly check if we have a saved version from a previous update before rendering
+      const savedVersion = localStorage.getItem('app-debug-version');
+      if (savedVersion) {
+        // We use a window load listener to make sure the DOM is ready before changing text
+        window.addEventListener('DOMContentLoaded', () => {
+          document.getElementById('debug-version').innerText = savedVersion;
+        });
+      }
+
+      // 2. Register your Service Worker
+      navigator.serviceWorker.register('./sw.js')
         .then((registration) => {
           const statusEl = document.getElementById('debug-status');
           if (!statusEl) return;
           
-          // Show initial registration state in the debug panel
           if (registration.installing) {
             statusEl.innerText = "Downloading...";
             statusEl.style.color = "#33b5e5";
@@ -44,11 +53,14 @@
           }
         });
 
-      // Listen for the live update message from sw.js when cache cleans up
+      // 3. Catch the live update message from sw.js
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'VERSION_UPDATE') {
-          // Instantly replace text with the new CACHE_NAME string
+          // Update the display text right now
           document.getElementById('debug-version').innerText = event.data.version;
+          
+          // Save it to local storage so it stays when refreshed!
+          localStorage.setItem('app-debug-version', event.data.version);
           
           // Flash status green to indicate update complete
           const statusEl = document.getElementById('debug-status');
