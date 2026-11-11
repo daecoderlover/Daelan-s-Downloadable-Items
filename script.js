@@ -265,3 +265,47 @@ function handleDownload(itemId) {
 const categoriesBtn = document.getElementById('categories-toggle-btn');
 const categoriesMenu = document.getElementById('categories-menu');
 
+container');
+if (!container) return;
+container.innerHTML = "";
+if (activeModalTab === "downloads") {
+const history = getDownloadHistory();
+if (history.length === 0) {
+container.innerHTML = <p style="color:#94A3B8; text-align:center; padding:20px;">No downloads recorded yet.</p>;
+return;
+}
+history.forEach(entry => {
+container.innerHTML += <div class="modal-item"> <div class="modal-item-info"> <h4>${entry.title}</h4> <span>Downloaded via ${entry.source} at ${entry.time}</span> </div> <button class="btn-download" style="width:auto; padding:6px 14px; font-size:12px;" onclick="handleDownload(${entry.id})">Download Again</button> </div>;
+});
+} else {
+const localIds = getSavedLocals();
+if (localIds.length === 0) {
+container.innerHTML = <p style="color:#94A3B8; text-align:center; padding:20px;">No Local files saved yet. Tap "+ Add to Locals" on any item to store a copy offline.</p>;
+return;
+}
+localIds.forEach(id => {
+const item = items.find(i => i.id === id);
+if (!item) return;
+container.innerHTML += <div class="modal-item"> <div class="modal-item-info"> <h4>${item.title}</h4> <span>${item.category || 'File'} • ${item.fileSize} (Offline Ready)</span> </div> <div style="display:flex; gap:6px;"> <button class="btn-download" style="width:auto; padding:6px 12px; font-size:12px;" onclick="handleDownload(${item.id})">Download</button> <button class="btn-remove-local" onclick="removeFromLocals(${item.id})">Remove</button> </div> </div>;
+});
+}
+}
+function removeFromLocals(itemId) {
+const item = items.find(i => i.id === itemId);
+const updated = getSavedLocals().filter(id => id !== itemId);
+localStorage.setItem("daelan-saved-locals", JSON.stringify(updated));
+if (item && navigator.serviceWorker && navigator.serviceWorker.controller) {
+const urlsToRemove = item.downloadLinks.map(l => l.url);
+if (item.thumbnail) urlsToRemove.push(item.thumbnail);
+navigator.serviceWorker.controller.postMessage({
+type: "REMOVE_LOCAL_ITEM",
+urls: urlsToRemove
+});
+}
+renderModalContent();
+applyFiltersAndRender();
+}
+// === INITIALIZE ===
+applyFiltersAndRender();
+console.log("✅ Daelan's Downloadable Website loaded!");
+console.log("🛡️ Safety active — script/program files blocked");
