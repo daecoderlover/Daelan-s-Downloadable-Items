@@ -3,22 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Search Console Verification -->
     <meta name="google-site-verification" content="og6FeBb6OchdvgFyNtK5Zou97V8IQocQrxjziH6Pafs" />
-
-    <!-- Hides site from public Google search results -->
     <meta name="robots" content="noindex, nofollow" />
 
     <title>Daelan's Downloadable Items</title>
     <link rel="stylesheet" href="style.css">
     <link class="icon" type="image/png" href="gem192.png">
-
-    <!-- PWA Manifest & Service Worker Setup with Debug Hook -->
     <link rel="manifest" href="./manifest.json">
+
     <script>
     if ('serviceWorker' in navigator) {
-      // 1. Instantly check if we have a saved version from a previous update before rendering
       const savedVersion = localStorage.getItem('app-debug-version');
       if (savedVersion) {
         window.addEventListener('DOMContentLoaded', () => {
@@ -26,12 +20,10 @@
         });
       }
 
-      // 2. Register your Service Worker (Bypasses GitHub Cache)
       navigator.serviceWorker.register('./sw.js?update=' + Date.now())
         .then((registration) => {
           const statusEl = document.getElementById('debug-status');
           if (!statusEl) return;
-          
           if (registration.installing) {
             statusEl.innerText = "Downloading...";
             statusEl.style.color = "#33b5e5";
@@ -39,13 +31,11 @@
             statusEl.innerText = "Update Ready";
             statusEl.style.color = "#ffbb33";
           } else if (registration.active) {
-            // Clears "Checking..." and stably displays Running alongside your saved version string
             statusEl.innerText = "Running";
             statusEl.style.color = "#00C851";
           }
         })
-        .catch(err => {
-          console.error("Service worker failed:", err);
+        .catch(() => {
           const statusEl = document.getElementById('debug-status');
           if (statusEl) {
             statusEl.innerText = "Error";
@@ -53,22 +43,31 @@
           }
         });
 
-      // 3. Catch the live update message from sw.js
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'VERSION_UPDATE') {
-          // Update the display text right now
           document.getElementById('debug-version').innerText = event.data.version;
-          
-          // Save it to local storage so it stays when refreshed!
           localStorage.setItem('app-debug-version', event.data.version);
-          
-          // Flash status green to indicate update complete
           const statusEl = document.getElementById('debug-status');
           statusEl.innerText = "Updated Live!";
           statusEl.style.color = "#00ff00";
         }
       });
     }
+
+    // Device & Mode Detection
+    window.addEventListener('DOMContentLoaded', () => {
+      const ua = navigator.userAgent;
+      let os = "Unknown OS";
+      if (/android/i.test(ua)) os = "Android";
+      else if (/iPad|iPhone|iPod/.test(ua)) os = "iOS";
+      else if (/Win/.test(ua)) os = "Windows";
+      else if (/Mac/.test(ua)) os = "MacOS";
+
+      const isApp = window.matchMedia('(display-mode: standalone)').matches;
+      const mode = isApp ? "Installed App" : "Browser";
+      const deviceEl = document.getElementById('debug-device');
+      if (deviceEl) deviceEl.innerText = `${os} (${mode})`;
+    });
     </script>
 </head>
 <body>
@@ -76,7 +75,7 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo">
+            <a href="#" class="logo" onclick="resetFilters()">
                 <img src="gem192.png" alt="Daelan's Diamond" class="logo-icon">
                 <div class="logo-text">
                     <span class="logo-name">Daelan's</span>
@@ -85,18 +84,42 @@
             </a>
 
             <div class="nav-links">
-                <a href="#" class="nav-link active">Home</a>
-                <a href="#" class="nav-link">Upload</a>
+                <a href="#" class="nav-link active" onclick="resetFilters()">Home</a>
+                <a href="#" class="nav-link" onclick="alert('Server uploads are locked for release builds.')">Upload</a>
             </div>
 
             <div class="nav-actions">
-                <button class="categories-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                    Categories
-                </button>
-                <button class="my-downloads-btn">My Downloads</button>
+                <!-- Categories Wrapper -->
+                <div class="dropdown-wrapper">
+                    <button class="categories-btn" id="categories-toggle-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        Categories
+                    </button>
+                    <!-- Categories Dropdown Menu -->
+                    <div class="categories-menu" id="categories-menu">
+                        <div class="cat-group">
+                            <span class="cat-heading">Source Type</span>
+                            <button onclick="filterBySource('all')">All Sources</button>
+                            <button onclick="filterBySource('Local')">Local (Offline Ready)</button>
+                            <button onclick="filterBySource('Server')">Server (Wi-Fi / Data)</button>
+                        </div>
+                        <div class="cat-divider"></div>
+                        <div class="cat-group">
+                            <span class="cat-heading">File Types</span>
+                            <button onclick="filterByFileType('all')">All File Types</button>
+                            <button onclick="filterByFileType('Media')">Media</button>
+                            <button onclick="filterByFileType('Documents')">Documents</button>
+                            <button onclick="filterByFileType('Programming')">Programming</button>
+                            <button onclick="filterByFileType('Text')">Text</button>
+                            <button onclick="filterByFileType('Programs')">Programs</button>
+                            <button onclick="filterByFileType('Archives')">Archives</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="my-downloads-btn" id="open-mydownloads-btn">My Downloads</button>
             </div>
         </div>
     </nav>
@@ -111,7 +134,10 @@
             </svg>
             <input type="text" placeholder="Search for Downloadable Items" id="search-input">
         </div>
-        <!-- PWA Install Button -->
+        <div id="active-filter-bar" class="active-filter-bar" style="display: none;">
+            <span id="filter-label">Showing: All</span>
+            <button onclick="resetFilters()">Clear Filter ✕</button>
+        </div>
         <button id="install-app-btn" style="display: none; margin-top: 16px; padding:12px 20px; font-size:16px;">
           Install Daelan's Downloads App
         </button>
@@ -120,14 +146,32 @@
     <!-- Items Grid -->
     <section class="items-section">
         <div class="grid-container" id="items-grid">
-            <!-- Items loaded by JavaScript -->
+            <!-- Items loaded by script.js -->
         </div>
     </section>
 
+    <!-- My Downloads Modal -->
+    <div id="mydownloads-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>My Downloads</h2>
+                <button class="close-modal-btn" id="close-mydownloads-btn">✕</button>
+            </div>
+            <div class="modal-tabs">
+                <button class="tab-btn active" id="tab-downloads" onclick="switchModalTab('downloads')">Downloads History</button>
+                <button class="tab-btn" id="tab-locals" onclick="switchModalTab('locals')">Saved Locals (Offline)</button>
+            </div>
+            <div class="modal-body" id="modal-list-container">
+                <!-- Populated dynamically by script.js -->
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Debug Info Panel -->
-    <div id="debug-panel" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.85); color: #00ff00; font-family: monospace; font-size: 11px; padding: 8px 12px; border-radius: 5px; border: 1px solid #333; z-index: 9999; pointer-events: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div id="debug-panel">
         [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
-        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.2.1 (Loaded)</span>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.2.1 (Loaded)</span><br>
+        [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
     </div>
 
 <script>
@@ -143,11 +187,11 @@ window.addEventListener('beforeinstallprompt', (event) => {
 installButton.addEventListener('click', async () => {
   if (!deferredInstallPrompt) return;
   deferredInstallPrompt.prompt();
-  const result = await deferredInstallPrompt.userChoice;
+  await deferredInstallPrompt.userChoice;
   deferredInstallPrompt = null;
   installButton.style.display = 'none';
 });
 </script>
-</body>
 <script src="script.js"></script>
+</body>
 </html>
