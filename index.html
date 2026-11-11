@@ -27,8 +27,8 @@
         });
       }
 
-      // 2. Register your Service Worker
-      navigator.serviceWorker.register('./sw.js')
+      // 2. Register your Service Worker (Bypasses GitHub Cache)
+navigator.serviceWorker.register('./sw.js?update=' + Date.now())
         .then((registration) => {
           const statusEl = document.getElementById('debug-status');
           if (!statusEl) return;
