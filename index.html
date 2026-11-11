@@ -21,14 +21,13 @@
       // 1. Instantly check if we have a saved version from a previous update before rendering
       const savedVersion = localStorage.getItem('app-debug-version');
       if (savedVersion) {
-        // We use a window load listener to make sure the DOM is ready before changing text
         window.addEventListener('DOMContentLoaded', () => {
           document.getElementById('debug-version').innerText = savedVersion;
         });
       }
 
       // 2. Register your Service Worker (Bypasses GitHub Cache)
-navigator.serviceWorker.register('./sw.js?update=' + Date.now())
+      navigator.serviceWorker.register('./sw.js?update=' + Date.now())
         .then((registration) => {
           const statusEl = document.getElementById('debug-status');
           if (!statusEl) return;
@@ -40,6 +39,7 @@ navigator.serviceWorker.register('./sw.js?update=' + Date.now())
             statusEl.innerText = "Update Ready";
             statusEl.style.color = "#ffbb33";
           } else if (registration.active) {
+            // Clears "Checking..." and stably displays Running alongside your saved version string
             statusEl.innerText = "Running";
             statusEl.style.color = "#00C851";
           }
