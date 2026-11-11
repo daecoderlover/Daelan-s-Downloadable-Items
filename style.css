@@ -25,6 +25,7 @@ body {
     background-color: var(--bg-main);
     color: var(--text-white);
     min-height: 100vh;
+    padding-bottom: 80px;
     background-image: 
         radial-gradient(circle at top center, rgba(59, 130, 246, 0.08), transparent 55%),
         linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.6) 100%);
@@ -106,6 +107,11 @@ body {
     gap: 16px;
 }
 
+/* === CATEGORIES DROPDOWN === */
+.dropdown-wrapper {
+    position: relative;
+}
+
 .categories-btn {
     background: transparent;
     border: none;
@@ -122,6 +128,62 @@ body {
 
 .categories-btn:hover {
     background: rgba(59, 130, 246, 0.15);
+}
+
+.categories-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 44px;
+    background: var(--bg-card);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    border-radius: 12px;
+    width: 225px;
+    padding: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), var(--shadow-glow);
+    z-index: 200;
+}
+
+.categories-menu.show {
+    display: block;
+}
+
+.cat-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cat-heading {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    font-weight: 700;
+    padding: 4px 10px;
+    letter-spacing: 0.6px;
+}
+
+.categories-menu button {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.categories-menu button:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--text-white);
+}
+
+.cat-divider {
+    height: 1px;
+    background: rgba(59, 130, 246, 0.2);
+    margin: 8px 0;
 }
 
 .my-downloads-btn {
@@ -142,9 +204,7 @@ body {
 
 /* === INSTALL PWA BUTTON === */
 #install-app-btn {
-    /* Kept hidden until prompt activates via your JavaScript */
     display: none; 
-    
     background: linear-gradient(90deg, #2563EB, #3B82F6);
     color: white;
     border: none;
@@ -152,6 +212,7 @@ body {
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
+    margin: 16px auto 0;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -203,6 +264,27 @@ body {
     color: var(--text-gray);
 }
 
+.active-filter-bar {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(30, 41, 59, 0.9);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--accent-cyan);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.active-filter-bar button {
+    background: none;
+    border: none;
+    color: #f87171;
+    cursor: pointer;
+    font-weight: 700;
+}
+
 /* === ITEMS GRID === */
 .items-section {
     max-width: 1400px;
@@ -220,10 +302,11 @@ body {
     background: var(--bg-card);
     border-radius: 14px;
     overflow: hidden;
-    border: 1px solid transparent;
+    border: 1px solid rgba(59, 130, 246, 0.15);
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 }
 
 .item-card.featured {
@@ -233,7 +316,7 @@ body {
 }
 
 .item-card:hover {
-    border-color: rgba(59, 130, 246, 0.4);
+    border-color: rgba(59, 130, 246, 0.5);
     background: var(--bg-card-hover);
 }
 
@@ -304,12 +387,54 @@ body {
 .card-content {
     padding: 16px;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* === SERVER VS LOCAL & CATEGORY BADGES === */
+.badges-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.badge-server {
+    background: rgba(0, 217, 255, 0.12);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(0, 217, 255, 0.4);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-local {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.45);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-cat {
+    background: rgba(30, 41, 59, 0.9);
+    color: var(--text-light);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
 }
 
 .card-title {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 6px;
+    color: var(--text-white);
 }
 
 .card-desc {
@@ -327,7 +452,41 @@ body {
     margin-bottom: 14px;
 }
 
-.download-btn {
+/* === CARD BUTTONS (ADD TO LOCALS + DOWNLOAD) === */
+.card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-add-local {
+    width: 100%;
+    background: rgba(30, 41, 59, 0.9);
+    color: var(--text-light);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    padding: 9px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.btn-add-local:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--text-white);
+    border-color: var(--border-glow);
+}
+
+.btn-add-local.saved {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.45);
+    cursor: default;
+}
+
+.download-btn,
+.btn-download {
     width: 100%;
     background: linear-gradient(90deg, #0077FF, #2584FF);
     color: white;
@@ -337,23 +496,12 @@ body {
     font-weight: 600;
     cursor: pointer;
     font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.download-btn:hover {
+.download-btn:hover,
+.btn-download:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(37, 132, 255, 0.35);
-}
-
-/* === RESPONSIVE === */
-@media (max-width: 900px) {
-    .nav-links { display: none; }
-    .grid-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-    .item-card.featured { transform: none; }
-}
-
-@media (max-width: 480px) {
-    .nav-container { padding: 0 16px; }
-    .my-downloads-btn, #install-app-btn { padding: 8px 16px; font-size: 13px; }
-    .grid-container { grid-template-columns: 1fr; }
-}
