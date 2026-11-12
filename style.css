@@ -505,3 +505,152 @@ body {
 .download-btn:hover,
 .btn-download:hover {
     transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(37, 132, 255, 0.35);
+}
+
+/* === MY DOWNLOADS MODAL === */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 16, 31, 0.85);
+    backdrop-filter: blur(6px);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-box {
+    background: var(--bg-card);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    box-shadow: var(--shadow-glow);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    color: var(--text-gray);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.close-modal-btn:hover {
+    color: var(--text-white);
+}
+
+.modal-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-gray);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    color: var(--accent-cyan);
+    border-bottom-color: var(--border-glow);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.modal-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-item {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    padding: 12px 14px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-item-info h4 {
+    font-size: 14px;
+    color: var(--text-white);
+    margin-bottom: 4px;
+}
+
+.modal-item-info span {
+    font-size: 11px;
+    color: var(--text-gray);
+}
+
+.btn-remove-local {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-remove-local:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* === FLOATING DEBUG PANEL === */
+#debug-panel {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(10, 16, 31, 0.92);
+    color: #00ff00;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    z-index: 9999;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+    .nav-links { display: none; }
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    .item-card.featured { transform: none; }
+}
+
+@media (max-width: 480px) {
+    .nav-container { padding: 0 16px; }
+    .my-downloads-btn, #install-app-btn { padding: 8px 16px; font-size: 13px; }
+    .grid-container { grid-template-columns: 1fr; }
+}
+
