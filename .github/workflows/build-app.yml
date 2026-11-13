@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: 'Version Name shown in Android App Info (numbers only, e.g., 1.3.3)'
+        description: 'Version Name shown in Android App Info (numbers only, e.g., 1.3.4)'
         required: true
-        default: '1.3.3'
+        default: '1.3.4'
       version_code:
-        description: 'Version Code integer (must increase every build, e.g., 8)'
+        description: 'Version Code integer (must increase every build, e.g., 9)'
         required: true
-        default: '8'
+        default: '9'
 
 permissions:
   contents: write
@@ -43,7 +43,7 @@ jobs:
       - name: Create & Build Android Wrapper
         run: |
           CLEAN_VERSION=$(echo "${{ github.event.inputs.version_name }}" | grep -oE '[0-9]+(\.[0-9]+)*' | head -n 1)
-          if [ -z "$CLEAN_VERSION" ]; then CLEAN_VERSION="1.3.3"; fi
+          if [ -z "$CLEAN_VERSION" ]; then CLEAN_VERSION="1.3.4"; fi
 
           cordova create app_wrapper io.github.daecoderlover.daelansitems "DaelansDownloads"
           
@@ -62,7 +62,7 @@ jobs:
           <widget id="io.github.daecoderlover.daelansitems" version="${CLEAN_VERSION}" android-versionCode="${{ github.event.inputs.version_code }}" xmlns="http://w3.org" xmlns:android="http://android.com">
               <name>Daelan&apos;s Downloads</name>
               <description>Daelan&apos;s Downloadable Items App</description>
-              <content src="https://daecoderlover.github.io/Daelan-s-Downloadable-Items/" />
+              <content src="https://github.io" />
               ${ICON_TAG}
               <access origin="*" />
               <allow-navigation href="*" />
@@ -75,16 +75,21 @@ jobs:
           cordova platform add android@13.0.0
           cordova build android --release -- --packageType=apk
 
-      - name: Sign APK with Valid Android Certificate
+      - name: Sign APK with Permanent Release Keystore
         run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+          
           BUILD_TOOLS=$(find $ANDROID_HOME/build-tools -maxdepth 1 | sort -V | tail -n 1)
           UNSIGNED_APK=$(find app_wrapper/platforms/android/app/build/outputs/apk -name "*.apk" | head -n 1)
           ALIGNED_APK="DaelansDownloads-aligned.apk"
 
-          keytool -genkey -v -keystore release.keystore -alias daelan_key -keyalg RSA -keysize 2048 -validity 10000 -storepass daelan123 -keypass daelan123 -dname "CN=Daelan, OU=Dev, O=Daelan, L=Calauan, S=Laguna, C=PH"
-
           $BUILD_TOOLS/zipalign -v -p 4 "$UNSIGNED_APK" "$ALIGNED_APK"
-          $BUILD_TOOLS/apksigner sign --ks release.keystore --ks-pass pass:daelan123 --key-pass pass:daelan123 --out "DaelansDownloads.apk" "$ALIGNED_APK"
+          $BUILD_TOOLS/apksigner sign \
+            --ks release.keystore \
+            --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
+            --ks-pass pass:"${{ secrets.KEYSTORE_PASSWORD }}" \
+            --key-pass pass:"${{ secrets.KEY_PASSWORD }}" \
+            --out "DaelansDownloads.apk" "$ALIGNED_APK"
 
       - name: Save DaelansDownloads.apk Directly into Repository
         run: |
@@ -94,4 +99,3 @@ jobs:
           git add DaelansDownloads.apk
           git commit -m "Build DaelansDownloads.apk v${{ github.event.inputs.version_name }}" || exit 0
           git push
-          
