@@ -13,27 +13,54 @@
 
     <script>
     if ('serviceWorker' in navigator) {
+      // 1. Show last saved version immediately while checking
       const savedVersion = localStorage.getItem('app-debug-version');
       if (savedVersion) {
         window.addEventListener('DOMContentLoaded', () => {
-          document.getElementById('debug-version').innerText = savedVersion;
+          const verEl = document.getElementById('debug-version');
+          if (verEl) verEl.innerText = savedVersion;
         });
       }
 
+      // Helper to ask the active Service Worker for its exact CACHE_NAME
+      function syncVersionFromSW(worker) {
+        if (!worker) return;
+        worker.postMessage({ type: 'GET_VERSION' });
+      }
+
+      // 2. Register Service Worker and track state changes live
       navigator.serviceWorker.register('./sw.js?update=' + Date.now())
         .then((registration) => {
           const statusEl = document.getElementById('debug-status');
-          if (!statusEl) return;
-          if (registration.installing) {
-            statusEl.innerText = "Downloading...";
-            statusEl.style.color = "#33b5e5";
-          } else if (registration.waiting) {
-            statusEl.innerText = "Update Ready";
-            statusEl.style.color = "#ffbb33";
-          } else if (registration.active) {
-            statusEl.innerText = "Running";
-            statusEl.style.color = "#00C851";
+
+          if (registration.active) {
+            if (statusEl) {
+              statusEl.innerText = "Running";
+              statusEl.style.color = "#00C851";
+            }
+            syncVersionFromSW(registration.active);
           }
+
+          // Listen for new updates installing in the background
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (!newWorker) return;
+
+            if (statusEl) {
+              statusEl.innerText = "Downloading...";
+              statusEl.style.color = "#33b5e5";
+            }
+
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'activated') {
+                if (statusEl) {
+                  statusEl.innerText = "Updated Live!";
+                  statusEl.style.color = "#00ff00";
+                }
+                syncVersionFromSW(newWorker);
+              }
+            });
+          });
         })
         .catch(() => {
           const statusEl = document.getElementById('debug-status');
@@ -43,13 +70,12 @@
           }
         });
 
+      // 3. Receive version reply from sw.js and lock it in localStorage
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'VERSION_UPDATE') {
-          document.getElementById('debug-version').innerText = event.data.version;
+          const verEl = document.getElementById('debug-version');
+          if (verEl) verEl.innerText = event.data.version;
           localStorage.setItem('app-debug-version', event.data.version);
-          const statusEl = document.getElementById('debug-status');
-          statusEl.innerText = "Updated Live!";
-          statusEl.style.color = "#00ff00";
         }
       });
     }
@@ -170,7 +196,7 @@
     <!-- Floating Debug Info Panel -->
     <div id="debug-panel">
         [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
-        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.2.1 (Loaded)</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.3.2 (Loaded)</span><br>
         [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
     </div>
 
