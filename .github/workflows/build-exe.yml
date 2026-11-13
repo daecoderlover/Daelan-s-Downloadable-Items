@@ -18,12 +18,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
         with:
-          node-version: '22'
+          dotnet-version: '8.0.x'
 
-      - name: Create Electron Wrapper & Build EXE
+      - name: Create WebView2 Wrapper & Build EXE
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
@@ -31,84 +31,119 @@ jobs:
           $version = "${{ github.event.inputs.version_name }}"
           if ([string]::IsNullOrWhiteSpace($version)) { $version = "1.3.4" }
 
-          New-Item -ItemType Directory -Force -Path "win_wrapper\www" | Out-Null
+          New-Item -ItemType Directory -Force -Path "win_wrapper" | Out-Null
 
-          # Copy website files into win_wrapper/www (excluding build folders and binaries)
-          Get-ChildItem -Path . -Force | Where-Object { 
-            $_.Name -notin @('win_wrapper', 'app_wrapper', '.git', '.github') -and 
-            $_.Extension -notin @('.apk', '.exe') 
-          } | Copy-Item -Destination "win_wrapper\www" -Recurse -Force
-
-          # Find gem512.png (meets electron-builder's >=256x256 icon requirement)
+          # Convert gem512.png into a proper Windows .ico file for the EXE
           $iconFile = Get-ChildItem -Path . -Filter "gem512.png" -Recurse -Depth 3 | Select-Object -First 1
-          $iconConfig = ""
+          $iconProperty = ""
           if ($iconFile) {
-              Copy-Item $iconFile.FullName -Destination "win_wrapper\icon.png"
-              $iconConfig = '"icon": "icon.png",'
+            Add-Type -AssemblyName System.Drawing
+            $bmp = [System.Drawing.Bitmap]::FromFile($iconFile.FullName)
+            $resized = New-Object System.Drawing.Bitmap($bmp, 256, 256)
+            $ms = New-Object System.IO.MemoryStream
+            $resized.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
+            $pngBytes = $ms.ToArray()
+
+            $icoPath = Join-Path (Resolve-Path "win_wrapper") "app.ico"
+            $fs = [System.IO.File]::Create($icoPath)
+            $bw = New-Object System.IO.BinaryWriter($fs)
+            $bw.Write([uint16]0)
+            $bw.Write([uint16]1)
+            $bw.Write([uint16]1)
+            $bw.Write([byte]0)
+            $bw.Write([byte]0)
+            $bw.Write([byte]0)
+            $bw.Write([byte]0)
+            $bw.Write([uint16]1)
+            $bw.Write([uint16]32)
+            $bw.Write([uint32]$pngBytes.Length)
+            $bw.Write([uint32]22)
+            $bw.Write($pngBytes)
+            $bw.Close()
+            $fs.Close()
+            $bmp.Dispose()
+            $resized.Dispose()
+
+            $iconProperty = "<ApplicationIcon>app.ico</ApplicationIcon>"
           }
 
           Set-Location "win_wrapper"
 
-          # Create Electron main process file
-          $mainJs = @"
-          const { app, BrowserWindow } = require('electron');
-          const path = require('path');
-
-          function createWindow() {
-            const win = new BrowserWindow({
-              width: 1200,
-              height: 800,
-              autoHideMenuBar: true,
-              webPreferences: {
-                nodeIntegration: false,
-                contextIsolation: true
-              }
-            });
-            win.loadFile(path.join(__dirname, 'www', 'index.html'));
-          }
-
-          app.whenReady().then(createWindow);
-
-          app.on('window-all-closed', () => {
-            if (process.platform !== 'darwin') app.quit();
-          });
+          # Create C# Project File (.csproj)
+          $csproj = @"
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>WinExe</OutputType>
+              <TargetFramework>net8.0-windows</TargetFramework>
+              <UseWindowsForms>true</UseWindowsForms>
+              <AssemblyName>DaelansDownloads</AssemblyName>
+              <Version>$version</Version>
+              <AssemblyTitle>Daelan's Downloads</AssemblyTitle>
+              <Product>Daelan's Downloads</Product>
+              $iconProperty
+              <PublishSingleFile>true</PublishSingleFile>
+              <SelfContained>false</SelfContained>
+              <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+            </PropertyGroup>
+            <ItemGroup>
+              <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+            </ItemGroup>
+          </Project>
           "@
-          $mainJs | Out-File -FilePath "main.js" -Encoding utf8NoBOM
+          $csproj | Out-File -FilePath "DaelansDownloads.csproj" -Encoding utf8NoBOM
 
-          # Create package.json with latest Electron v45 and electron-builder v26
-          $packageJson = @"
+          # Create Program.cs with WebView2 pointing to your live GitHub Pages site
+          $programCs = @"
+          using System;
+          using System.Drawing;
+          using System.IO;
+          using System.Windows.Forms;
+          using Microsoft.Web.WebView2.WinForms;
+
+          namespace DaelansDownloads
           {
-            "name": "daelans-downloads",
-            "productName": "Daelan's Downloads",
-            "version": "$version",
-            "description": "Daelan's Downloadable Items Desktop App",
-            "main": "main.js",
-            "scripts": {
-              "dist": "electron-builder --win portable"
-            },
-            "build": {
-              "appId": "io.github.daecoderlover.daelansitems",
-              "win": {
-                $iconConfig
-                "target": "portable"
-              },
-              "portable": {
-                "artifactName": "DaelansDownloads.exe"
+              internal static class Program
+              {
+                  [STAThread]
+                  static void Main()
+                  {
+                      ApplicationConfiguration.Initialize();
+                      Application.Run(new MainForm());
+                  }
               }
-            },
-            "devDependencies": {
-              "electron": "^45.3.1",
-              "electron-builder": "^26.18.0"
-            }
+
+              public class MainForm : Form
+              {
+                  private readonly WebView2 webView;
+
+                  public MainForm()
+                  {
+                      this.Text = "Daelan's Downloads";
+                      this.Width = 1200;
+                      this.Height = 800;
+                      this.StartPosition = FormStartPosition.CenterScreen;
+
+                      try
+                      {
+                          this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+                      }
+                      catch { }
+
+                      webView = new WebView2
+                      {
+                          Dock = DockStyle.Fill,
+                          Source = new Uri("https://github.io")
+                      };
+
+                      this.Controls.Add(webView);
+                  }
+              }
           }
           "@
-          $packageJson | Out-File -FilePath "package.json" -Encoding utf8NoBOM
+          $programCs | Out-File -FilePath "Program.cs" -Encoding utf8NoBOM
 
-          npm install
-          if ($LASTEXITCODE -ne 0) { throw "npm install failed" }
-
-          npm run dist
-          if ($LASTEXITCODE -ne 0) { throw "electron-builder failed" }
+          dotnet publish -c Release -r win-x64 -o publish
+          if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
 
       - name: Prepare EXE and Check Size
         id: prep_exe
@@ -116,11 +151,11 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
 
-          if (-not (Test-Path "win_wrapper\dist\DaelansDownloads.exe")) {
-            throw "DaelansDownloads.exe was not found in win_wrapper\dist\"
+          if (-not (Test-Path "win_wrapper\publish\DaelansDownloads.exe")) {
+            throw "DaelansDownloads.exe was not found in win_wrapper\publish\"
           }
 
-          Move-Item -Path "win_wrapper\dist\DaelansDownloads.exe" -Destination ".\DaelansDownloads.exe" -Force
+          Move-Item -Path "win_wrapper\publish\DaelansDownloads.exe" -Destination ".\DaelansDownloads.exe" -Force
           Remove-Item -Path "win_wrapper" -Recurse -Force
 
           $sizeMB = [math]::Round((Get-Item ".\DaelansDownloads.exe").Length / 1MB, 2)
@@ -138,7 +173,7 @@ jobs:
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@://github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f DaelansDownloads.exe
 
           $changes = git status --porcelain DaelansDownloads.exe
