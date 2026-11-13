@@ -45,3 +45,8 @@ Go to  **Issues** or **Discusions** to submit files — read the rules, then sen
 ## © License
 **MIT License** — Copyright © 2026 daecoderlover
 Free to use & share with credit given.
+
+---
+
+## Code Signing Policy
+Free code signing provided by [SignPath.io](https://signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
