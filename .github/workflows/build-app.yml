@@ -17,27 +17,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Repository (Gets your gem192.png icon)
+        uses: actions/checkout@v4
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Cordova & Android Tools
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Cordova
         run: npm install -g cordova
 
-      - name: Generate Native Android Wrapper Project
+      - name: Create & Build Android Wrapper
         run: |
-          cordova create app_wrapper io.github.daecoderlover.daelansitems "Daelan's Downloads"
+          cordova create app_wrapper io.github.daecoderlover.daelansitems "DaelansDownloads"
+          cp gem192.png app_wrapper/icon.png
           cd app_wrapper
-          
-          # Configure config.xml to load your live GitHub Pages site directly
+
           cat << 'EOF' > config.xml
           <?xml version='1.0' encoding='utf-8'?>
           <widget id="io.github.daecoderlover.daelansitems" version="${{ github.event.inputs.version_name }}" android-versionCode="${{ github.event.inputs.version_code }}" xmlns="http://w3.org" xmlns:android="http://android.com">
-              <name>Daelan's Downloads</name>
-              <description>Daelan's Downloadable Items App</description>
+              <name>Daelan&apos;s Downloads</name>
+              <description>Daelan&apos;s Downloadable Items App</description>
               <content src="https://github.io" />
+              <icon src="icon.png" />
               <access origin="*" />
               <allow-navigation href="*" />
               <preference name="Fullscreen" value="false" />
@@ -46,20 +55,18 @@ jobs:
           </widget>
           EOF
 
-          cordova platform add android
+          cordova platform add android@13.0.0
           cordova build android --release
 
-      - name: Sign APK with Valid v2/v3 Android Certificate
+      - name: Sign APK with Valid Android Certificate
         run: |
           BUILD_TOOLS=$(find $ANDROID_HOME/build-tools -maxdepth 1 | sort -V | tail -n 1)
           UNSIGNED_APK="app_wrapper/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk"
           ALIGNED_APK="DaelansDownloads-aligned.apk"
           FINAL_APK="DaelansDownloads-v${{ github.event.inputs.version_name }}.apk"
 
-          # Generate a valid Android keystore
-          keytool -genkey -v -keystore release.keystore -alias daelan_key -keyalg RSA -keysize 2048 -validity 10000 -storepass daelan123 -keypass daelan123 -dname "CN=Daelan, OU=Dev, O=Daelan, L=SanPablo, S=Laguna, C=PH"
+          keytool -genkey -v -keystore release.keystore -alias daelan_key -keyalg RSA -keysize 2048 -validity 10000 -storepass daelan123 -keypass daelan123 -dname "CN=Daelan, OU=Dev, O=Daelan, L=Calauan, S=Laguna, C=PH"
 
-          # Align and sign so Android Package Installer never says "Invalid"
           $BUILD_TOOLS/zipalign -v -p 4 "$UNSIGNED_APK" "$ALIGNED_APK"
           $BUILD_TOOLS/apksigner sign --ks release.keystore --ks-pass pass:daelan123 --key-pass pass:daelan123 --out "$FINAL_APK" "$ALIGNED_APK"
 
