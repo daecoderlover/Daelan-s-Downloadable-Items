@@ -14,10 +14,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout Repository (Gets your gem192.png icon)
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Java 17
@@ -26,10 +26,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          node-version: '20'
+          gradle-version: '8.7'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Install Cordova
         run: npm install -g cordova
@@ -40,7 +43,7 @@ jobs:
           cp gem192.png app_wrapper/icon.png
           cd app_wrapper
 
-          cat << 'EOF' > config.xml
+          cat << EOF > config.xml
           <?xml version='1.0' encoding='utf-8'?>
           <widget id="io.github.daecoderlover.daelansitems" version="${{ github.event.inputs.version_name }}" android-versionCode="${{ github.event.inputs.version_code }}" xmlns="http://w3.org" xmlns:android="http://android.com">
               <name>Daelan&apos;s Downloads</name>
@@ -75,3 +78,4 @@ jobs:
         with:
           name: DaelansDownloads-v${{ github.event.inputs.version_name }}
           path: DaelansDownloads-v${{ github.event.inputs.version_name }}.apk
+          
