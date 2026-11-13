@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: 'Version Name shown in Android App Info (e.g., 1.3.2)'
+        description: 'Version Name shown in Android App Info (numbers only, e.g., 1.3.3)'
         required: true
-        default: '1.3.2'
+        default: '1.3.3'
       version_code:
         description: 'Version Code integer (must increase every build, e.g., 6)'
         required: true
@@ -39,8 +39,11 @@ jobs:
 
       - name: Create & Build Android Wrapper
         run: |
-          cordova telemetry off
-          cordova create app_wrapper io.github.daecoderlover.daelansitems "DaelansDownloads" --no-telemetry
+          # Clean version string to numbers and dots only so Android never rejects it
+          CLEAN_VERSION=$(echo "${{ github.event.inputs.version_name }}" | grep -oE '[0-9]+(\.[0-9]+)*' | head -n 1)
+          if [ -z "$CLEAN_VERSION" ]; then CLEAN_VERSION="1.3.3"; fi
+
+          cordova create app_wrapper io.github.daecoderlover.daelansitems "DaelansDownloads"
           
           # Safely find gem192.png anywhere in your repo
           ICON_PATH=$(find . -maxdepth 3 -name "gem192.png" | head -n 1)
@@ -55,7 +58,7 @@ jobs:
 
           cat << EOF > config.xml
           <?xml version='1.0' encoding='utf-8'?>
-          <widget id="io.github.daecoderlover.daelansitems" version="${{ github.event.inputs.version_name }}" android-versionCode="${{ github.event.inputs.version_code }}" xmlns="http://w3.org" xmlns:android="http://android.com">
+          <widget id="io.github.daecoderlover.daelansitems" version="${CLEAN_VERSION}" android-versionCode="${{ github.event.inputs.version_code }}" xmlns="http://w3.org" xmlns:android="http://android.com">
               <name>Daelan&apos;s Downloads</name>
               <description>Daelan&apos;s Downloadable Items App</description>
               <content src="https://github.io" />
@@ -68,15 +71,18 @@ jobs:
           </widget>
           EOF
 
-          cordova platform add android@13.0.0 --no-telemetry
-          cordova build android --release --no-telemetry
+          cordova platform add android@13.0.0
+          cordova build android --release
 
       - name: Sign APK with Valid Android Certificate
         run: |
+          CLEAN_VERSION=$(echo "${{ github.event.inputs.version_name }}" | grep -oE '[0-9]+(\.[0-9]+)*' | head -n 1)
+          if [ -z "$CLEAN_VERSION" ]; then CLEAN_VERSION="1.3.3"; fi
+
           BUILD_TOOLS=$(find $ANDROID_HOME/build-tools -maxdepth 1 | sort -V | tail -n 1)
           UNSIGNED_APK="app_wrapper/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk"
           ALIGNED_APK="DaelansDownloads-aligned.apk"
-          FINAL_APK="DaelansDownloads-v${{ github.event.inputs.version_name }}.apk"
+          FINAL_APK="DaelansDownloads-v${CLEAN_VERSION}.apk"
 
           keytool -genkey -v -keystore release.keystore -alias daelan_key -keyalg RSA -keysize 2048 -validity 10000 -storepass daelan123 -keypass daelan123 -dname "CN=Daelan, OU=Dev, O=Daelan, L=Calauan, S=Laguna, C=PH"
 
@@ -86,6 +92,6 @@ jobs:
       - name: Upload Ready-to-Install APK
         uses: actions/upload-artifact@v4
         with:
-          name: DaelansDownloads-v${{ github.event.inputs.version_name }}
-          path: DaelansDownloads-v${{ github.event.inputs.version_name }}.apk
+          name: DaelansDownloads-v${{ github.event.inputs.version_code }}
+          path: DaelansDownloads-v*.apk
           
