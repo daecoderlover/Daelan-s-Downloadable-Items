@@ -62,7 +62,7 @@ jobs:
           <widget id="io.github.daecoderlover.daelansitems" version="${CLEAN_VERSION}" android-versionCode="${{ github.event.inputs.version_code }}" xmlns="http://w3.org" xmlns:android="http://android.com">
               <name>Daelan&apos;s Downloads</name>
               <description>Daelan&apos;s Downloadable Items App</description>
-              <content src="https://daecoderlover.github.io/Daelan-s-Downloadable-Items/" />
+              <content src="index.html" />
               ${ICON_TAG}
               <access origin="*" />
               <allow-navigation href="*" />
