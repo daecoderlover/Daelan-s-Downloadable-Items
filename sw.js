@@ -43,9 +43,16 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Message: handle "+ Add to Locals" and "Remove" from script.js
+// Message: handle version requests, "+ Add to Locals", and "Remove" from script.js
 self.addEventListener("message", (event) => {
   if (!event.data) return;
+
+  if (event.data.type === "GET_VERSION") {
+    event.source.postMessage({
+      type: "VERSION_UPDATE",
+      version: CACHE_NAME
+    });
+  }
 
   if (event.data.type === "SAVE_LOCAL_ITEM") {
     caches.open(OFFLINE_CACHE).then((cache) => {
