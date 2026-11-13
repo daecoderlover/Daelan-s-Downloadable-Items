@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: 'Version Name shown in Android App Info (e.g., 1.3.1)'
+        description: 'Version Name shown in Android App Info (e.g., 1.3.2)'
         required: true
-        default: '1.3.1'
+        default: '1.3.2'
       version_code:
-        description: 'Version Code integer (must increase every build, e.g., 5)'
+        description: 'Version Code integer (must increase every build, e.g., 6)'
         required: true
-        default: '5'
+        default: '6'
 
 jobs:
   build:
@@ -31,16 +31,26 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK Licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Install Cordova
         run: npm install -g cordova
 
       - name: Create & Build Android Wrapper
         run: |
-          cordova create app_wrapper io.github.daecoderlover.daelansitems "DaelansDownloads"
-          cp gem192.png app_wrapper/icon.png
+          cordova telemetry off
+          cordova create app_wrapper io.github.daecoderlover.daelansitems "DaelansDownloads" --no-telemetry
+          
+          # Safely find gem192.png anywhere in your repo
+          ICON_PATH=$(find . -maxdepth 3 -name "gem192.png" | head -n 1)
+          if [ -n "$ICON_PATH" ]; then
+            cp "$ICON_PATH" app_wrapper/icon.png
+            ICON_TAG='<icon src="icon.png" />'
+          else
+            ICON_TAG=''
+          fi
+
           cd app_wrapper
 
           cat << EOF > config.xml
@@ -49,7 +59,7 @@ jobs:
               <name>Daelan&apos;s Downloads</name>
               <description>Daelan&apos;s Downloadable Items App</description>
               <content src="https://github.io" />
-              <icon src="icon.png" />
+              ${ICON_TAG}
               <access origin="*" />
               <allow-navigation href="*" />
               <preference name="Fullscreen" value="false" />
@@ -58,8 +68,8 @@ jobs:
           </widget>
           EOF
 
-          cordova platform add android@13.0.0
-          cordova build android --release
+          cordova platform add android@13.0.0 --no-telemetry
+          cordova build android --release --no-telemetry
 
       - name: Sign APK with Valid Android Certificate
         run: |
