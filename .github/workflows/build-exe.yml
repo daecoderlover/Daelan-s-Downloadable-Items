@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Create Electron Wrapper & Build Portable EXE
+      - name: Create Electron Wrapper & Build EXE
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
@@ -33,11 +33,13 @@ jobs:
 
           New-Item -ItemType Directory -Force -Path "win_wrapper\www" | Out-Null
 
+          # Copy website files into win_wrapper/www (excluding build folders and binaries)
           Get-ChildItem -Path . -Force | Where-Object { 
             $_.Name -notin @('win_wrapper', 'app_wrapper', '.git', '.github') -and 
             $_.Extension -notin @('.apk', '.exe') 
           } | Copy-Item -Destination "win_wrapper\www" -Recurse -Force
 
+          # Find gem512.png (meets electron-builder's >=256x256 icon requirement)
           $iconFile = Get-ChildItem -Path . -Filter "gem512.png" -Recurse -Depth 3 | Select-Object -First 1
           $iconConfig = ""
           if ($iconFile) {
@@ -47,6 +49,7 @@ jobs:
 
           Set-Location "win_wrapper"
 
+          # Create Electron main process file
           $mainJs = @"
           const { app, BrowserWindow } = require('electron');
           const path = require('path');
@@ -72,6 +75,7 @@ jobs:
           "@
           $mainJs | Out-File -FilePath "main.js" -Encoding utf8NoBOM
 
+          # Create package.json with latest Electron v45 and electron-builder v26
           $packageJson = @"
           {
             "name": "daelans-downloads",
@@ -106,8 +110,53 @@ jobs:
           npm run dist
           if ($LASTEXITCODE -ne 0) { throw "electron-builder failed" }
 
-      - name: Upload Unsigned Portable EXE (For SignPath)
-        uses: actions/upload-artifact@v4
+      - name: Prepare EXE and Check Size
+        id: prep_exe
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          if (-not (Test-Path "win_wrapper\dist\DaelansDownloads.exe")) {
+            throw "DaelansDownloads.exe was not found in win_wrapper\dist\"
+          }
+
+          Move-Item -Path "win_wrapper\dist\DaelansDownloads.exe" -Destination ".\DaelansDownloads.exe" -Force
+          Remove-Item -Path "win_wrapper" -Recurse -Force
+
+          $sizeMB = [math]::Round((Get-Item ".\DaelansDownloads.exe").Length / 1MB, 2)
+          Write-Host "Built DaelansDownloads.exe size: $sizeMB MB"
+
+          if ($sizeMB -lt 100) {
+            "can_commit=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "can_commit=false" >> $env:GITHUB_OUTPUT
+            Write-Warning "EXE is $sizeMB MB (>= 100MB GitHub repo limit). Publishing to GitHub Releases instead."
+          }
+
+      - name: Save DaelansDownloads.exe Directly into Repository
+        if: steps.prep_exe.outputs.can_commit == 'true'
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@://github.com"
+          git add -f DaelansDownloads.exe
+
+          $changes = git status --porcelain DaelansDownloads.exe
+          if (-not [string]::IsNullOrWhiteSpace($changes)) {
+            git commit -m "Build DaelansDownloads.exe v${{ github.event.inputs.version_name }}"
+            if ($LASTEXITCODE -ne 0) { throw "git commit failed" }
+
+            git push
+            if ($LASTEXITCODE -ne 0) { throw "git push failed" }
+          } else {
+            Write-Host "No changes to DaelansDownloads.exe to commit."
+          }
+
+      - name: Upload EXE to GitHub Release (Fallback if >= 100MB)
+        if: steps.prep_exe.outputs.can_commit == 'false'
+        uses: softprops/action-gh-release@v2
         with:
-          name: unsigned-portable-exe
-          path: win_wrapper/dist/DaelansDownloads.exe
+          tag_name: "v${{ github.event.inputs.version_name }}"
+          name: "Daelan's Downloads v${{ github.event.inputs.version_name }}"
+          files: DaelansDownloads.exe
+          make_latest: true
