@@ -110,23 +110,53 @@ jobs:
           npm run dist
           if ($LASTEXITCODE -ne 0) { throw "electron-builder failed" }
 
-      - name: Save DaelansDownloads.exe Directly into Repository
+      - name: Prepare EXE and Check Size
+        id: prep_exe
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
 
+          if (-not (Test-Path "win_wrapper\dist\DaelansDownloads.exe")) {
+            throw "DaelansDownloads.exe was not found in win_wrapper\dist\"
+          }
+
           Move-Item -Path "win_wrapper\dist\DaelansDownloads.exe" -Destination ".\DaelansDownloads.exe" -Force
           Remove-Item -Path "win_wrapper" -Recurse -Force
 
+          $sizeMB = [math]::Round((Get-Item ".\DaelansDownloads.exe").Length / 1MB, 2)
+          Write-Host "Built DaelansDownloads.exe size: $sizeMB MB"
+
+          if ($sizeMB -lt 100) {
+            "can_commit=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "can_commit=false" >> $env:GITHUB_OUTPUT
+            Write-Warning "EXE is $sizeMB MB (>= 100MB GitHub repo limit). Publishing to GitHub Releases instead."
+          }
+
+      - name: Save DaelansDownloads.exe Directly into Repository
+        if: steps.prep_exe.outputs.can_commit == 'true'
+        shell: pwsh
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add DaelansDownloads.exe
+          git add -f DaelansDownloads.exe
 
-          # Only commit if there are staged changes
-          git diff --staged --quiet
-          if ($LASTEXITCODE -ne 0) {
-              git commit -m "Build DaelansDownloads.exe v${{ github.event.inputs.version_name }}"
-              git push
+          $changes = git status --porcelain DaelansDownloads.exe
+          if (-not [string]::IsNullOrWhiteSpace($changes)) {
+            git commit -m "Build DaelansDownloads.exe v${{ github.event.inputs.version_name }}"
+            if ($LASTEXITCODE -ne 0) { throw "git commit failed" }
+
+            git push
+            if ($LASTEXITCODE -ne 0) { throw "git push failed" }
           } else {
-              Write-Output "No changes to DaelansDownloads.exe to commit."
+            Write-Host "No changes to DaelansDownloads.exe to commit."
           }
+
+      - name: Upload EXE to GitHub Release (Fallback if >= 100MB)
+        if: steps.prep_exe.outputs.can_commit == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ github.event.inputs.version_name }}"
+          name: "Daelan's Downloads v${{ github.event.inputs.version_name }}"
+          files: DaelansDownloads.exe
+          make_latest: true
