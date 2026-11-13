@@ -1,0 +1,115 @@
+name: Build Native Windows EXE
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version Name (e.g., 1.3.4)'
+        required: true
+        default: '1.3.4'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Create Electron Wrapper & Build EXE
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version_name }}"
+          if ([string]::IsNullOrWhiteSpace($version)) { $version = "1.3.4" }
+
+          New-Item -ItemType Directory -Force -Path "win_wrapper\www" | Out-Null
+
+          # Copy website files into win_wrapper/www (excluding build folders and binaries)
+          Get-ChildItem -Path . -Force | Where-Object {
+            $_.Name -notin @('win_wrapper', 'app_wrapper', '.git', '.github') -and $_.Extension -notin @('.apk', '.exe')
+          } | Copy-Item -Destination "win_wrapper\www" -Recurse -Force
+
+          # Find icon if available
+          $iconFile = Get-ChildItem -Path . -Filter "gem192.png" -Recurse -Depth 3 | Select-Object -First 1
+          $iconConfig = ""
+          if ($iconFile) {
+            Copy-Item $iconFile.FullName -Destination "win_wrapper\icon.png"
+            $iconConfig = '"icon": "icon.png",'
+          }
+
+          Set-Location "win_wrapper"
+
+          # Create Electron main process file
+          @"
+          const { app, BrowserWindow } = require('electron');
+          const path = require('path');
+
+          function createWindow() {
+            const win = new BrowserWindow({
+              width: 1200,
+              height: 800,
+              autoHideMenuBar: true,
+              webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true
+              }
+            });
+            win.loadFile(path.join(__dirname, 'www', 'index.html'));
+          }
+
+          app.whenReady().then(createWindow);
+          app.on('window-all-closed', () => {
+            if (process.platform !== 'darwin') app.quit();
+          });
+          "@ | Set-Content -Path "main.js" -Encoding UTF8
+
+          # Create package.json for electron-builder (portable single-file .exe)
+          @"
+          {
+            "name": "daelans-downloads",
+            "productName": "Daelan's Downloads",
+            "version": "$version",
+            "description": "Daelan's Downloadable Items Desktop App",
+            "main": "main.js",
+            "scripts": {
+              "dist": "electron-builder --win portable"
+            },
+            "build": {
+              "appId": "io.github.daecoderlover.daelansitems",
+              "win": {
+                $iconConfig
+                "target": "portable"
+              },
+              "portable": {
+                "artifactName": "DaelansDownloads.exe"
+              }
+            },
+            "devDependencies": {
+              "electron": "^33.0.0",
+              "electron-builder": "^25.1.8"
+            }
+          }
+          "@ | Set-Content -Path "package.json" -Encoding UTF8
+
+          npm install
+          npm run dist
+
+      - name: Save DaelansDownloads.exe Directly into Repository
+        shell: pwsh
+        run: |
+          Move-Item -Path "win_wrapper\dist\DaelansDownloads.exe" -Destination ".\DaelansDownloads.exe" -Force
+          Remove-Item -Path "win_wrapper" -Recurse -Force
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@://github.com"
+          git add DaelansDownloads.exe
+          git commit -m "Build DaelansDownloads.exe v${{ github.event.inputs.version_name }}"
+          git push
