@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Create Electron Wrapper & Build EXE
+      - name: Create Electron Wrapper & Build Portable EXE
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
@@ -33,13 +33,11 @@ jobs:
 
           New-Item -ItemType Directory -Force -Path "win_wrapper\www" | Out-Null
 
-          # Copy website files into win_wrapper/www
           Get-ChildItem -Path . -Force | Where-Object { 
-            $_.Name -notin @('win_wrapper', 'app_wrapper', '.git', '.github', 'DaelanCert.cer') -and 
+            $_.Name -notin @('win_wrapper', 'app_wrapper', '.git', '.github') -and 
             $_.Extension -notin @('.apk', '.exe') 
           } | Copy-Item -Destination "win_wrapper\www" -Recurse -Force
 
-          # Find gem512.png
           $iconFile = Get-ChildItem -Path . -Filter "gem512.png" -Recurse -Depth 3 | Select-Object -First 1
           $iconConfig = ""
           if ($iconFile) {
@@ -49,7 +47,6 @@ jobs:
 
           Set-Location "win_wrapper"
 
-          # Create Electron main process file
           $mainJs = @"
           const { app, BrowserWindow } = require('electron');
           const path = require('path');
@@ -75,7 +72,6 @@ jobs:
           "@
           $mainJs | Out-File -FilePath "main.js" -Encoding utf8NoBOM
 
-          # Create package.json
           $packageJson = @"
           {
             "name": "daelans-downloads",
@@ -110,60 +106,8 @@ jobs:
           npm run dist
           if ($LASTEXITCODE -ne 0) { throw "electron-builder failed" }
 
-      - name: Self-Sign EXE & Prepare Files
-        id: prep_exe
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-
-          Move-Item -Path "win_wrapper\dist\DaelansDownloads.exe" -Destination ".\DaelansDownloads.exe" -Force
-          Remove-Item -Path "win_wrapper" -Recurse -Force
-
-          # Generate a self-signed code signing certificate and sign the EXE
-          $cert = New-SelfSignedCertificate `
-            -Type CodeSigningCert `
-            -Subject "CN=Daelan's Downloads" `
-            -KeyUsage DigitalSignature `
-            -FriendlyName "Daelan Code Signing" `
-            -CertStoreLocation "Cert:\CurrentUser\My" `
-            -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}")
-
-          Export-Certificate -Cert $cert -FilePath ".\DaelanCert.cer" -Force | Out-Null
-          Set-AuthenticodeSignature -FilePath ".\DaelansDownloads.exe" -Certificate $cert -TimestampServer "http://digicert.com" | Out-Null
-
-          $sizeMB = [math]::Round((Get-Item ".\DaelansDownloads.exe").Length / 1MB, 2)
-          Write-Host "Signed DaelansDownloads.exe size: $sizeMB MB"
-
-          if ($sizeMB -lt 100) {
-            "can_commit=true" >> $env:GITHUB_OUTPUT
-          } else {
-            "can_commit=false" >> $env:GITHUB_OUTPUT
-          }
-
-      - name: Save EXE and Certificate to Repository
-        if: steps.prep_exe.outputs.can_commit == 'true'
-        shell: pwsh
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@://github.com"
-          git add -f DaelansDownloads.exe DaelanCert.cer
-
-          $changes = git status --porcelain DaelansDownloads.exe DaelanCert.cer
-          if (-not [string]::IsNullOrWhiteSpace($changes)) {
-            git commit -m "Build signed DaelansDownloads.exe v${{ github.event.inputs.version_name }}"
-            if ($LASTEXITCODE -ne 0) { throw "git commit failed" }
-
-            git push
-            if ($LASTEXITCODE -ne 0) { throw "git push failed" }
-          }
-
-      - name: Upload EXE and Certificate to GitHub Release (Fallback if >= 100MB)
-        if: steps.prep_exe.outputs.can_commit == 'false'
-        uses: softprops/action-gh-release@v2
+      - name: Upload Unsigned Portable EXE (For SignPath)
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: "v${{ github.event.inputs.version_name }}"
-          name: "Daelan's Downloads v${{ github.event.inputs.version_name }}"
-          files: |
-            DaelansDownloads.exe
-            DaelanCert.cer
-          make_latest: true
+          name: unsigned-portable-exe
+          path: win_wrapper/dist/DaelansDownloads.exe
