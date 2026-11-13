@@ -1,4 +1,4 @@
-const CACHE_NAME = "v1.3.2 (Hotfix of Expandable)";
+const CACHE_NAME = "v1.3.3 (Hotfix)";
 const OFFLINE_CACHE = "daelan-offline-locals-v1";
 const CORE_ASSETS = [
   "./",
