@@ -62,7 +62,7 @@ jobs:
           <widget id="io.github.daecoderlover.daelansitems" version="${CLEAN_VERSION}" android-versionCode="${{ github.event.inputs.version_code }}" xmlns="http://w3.org" xmlns:android="http://android.com">
               <name>Daelan&apos;s Downloads</name>
               <description>Daelan&apos;s Downloadable Items App</description>
-              <content src="https://daecoderlover.github.io/Daelan-s-Downloadable-Items/index.html" />
+              <content src="https://daecoderlover.github.io/Daelan-s-Downloadable-Items/" />
               ${ICON_TAG}
               <access origin="*" />
               <allow-navigation href="*" />
@@ -95,7 +95,7 @@ jobs:
         run: |
           rm -rf app_wrapper release.keystore DaelansDownloads-aligned.apk
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@://github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add DaelansDownloads.apk
           git commit -m "Build DaelansDownloads.apk v${{ github.event.inputs.version_name }}" || exit 0
           git push
