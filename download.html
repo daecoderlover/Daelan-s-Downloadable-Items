@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preparing Download...</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background-color: #ffffff;
+      color: #4a4a4a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 24px;
+    }
+    .icon-box {
+      width: 110px;
+      height: 110px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-box svg {
+      width: 100%;
+      height: 100%;
+    }
+    .item-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 18px;
+      max-width: 280px;
+    }
+    .progress-track {
+      width: 240px;
+      height: 6px;
+      background-color: #ececec;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background-color: #8e8e8e;
+      border-radius: 999px;
+      transition: width 0.2s ease-out;
+    }
+    .percent-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #6e6e6e;
+      margin-bottom: 6px;
+    }
+    .status-text {
+      font-size: 13px;
+      color: #9a9a9a;
+    }
+    .back-btn {
+      margin-top: 28px;
+      padding: 8px 18px;
+      font-size: 13px;
+      color: #666;
+      background: #f3f3f3;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="icon-box" id="platformIcon"></div>
+  <div class="item-title" id="itemTitle">Preparing file...</div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="percent-text" id="percentText">0%</div>
+  <div class="status-text" id="statusText">Connecting to download server...</div>
+
+  <button class="back-btn" id="backBtn" onclick="window.location.href='index.html'">← Back to Downloads</button>
+
+  <!-- Load your existing script.js containing items 1, 2, 3, 4 -->
+  <script src="script.js"></script>
+
+  <script>
+    const isWindows = navigator.userAgent.includes("Windows");
+
+    // Gray Cordova Bot SVG (for Android APK)
+    const cordovaSvg = `
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://w3.org">
+        <path d="M35 16H85L104 52L94 104H76L73 90H47L44 104H26L16 52L35 16Z" fill="#9E9E9E"/>
+        <path d="M40 34H51V41H69V34H80L88 54L82 80H38L32 54L40 34Z" fill="#FFFFFF"/>
+        <ellipse cx="48" cy="60" rx="3.5" ry="7" fill="#9E9E9E"/>
+        <ellipse cx="72" cy="60" rx="3.5" ry="7" fill="#9E9E9E"/>
+      </svg>`;
+
+    // Gray WebView2 Window SVG (for Windows EXE)
+    const webviewSvg = `
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://w3.org">
+        <rect x="16" y="22" width="88" height="76" rx="12" fill="#9E9E9E"/>
+        <circle cx="31" cy="35" r="3.5" fill="#FFFFFF"/>
+        <circle cx="42" cy="35" r="3.5" fill="#FFFFFF"/>
+        <circle cx="53" cy="35" r="3.5" fill="#FFFFFF"/>
+        <rect x="24" y="46" width="72" height="44" rx="6" fill="#FFFFFF"/>
+        <path d="M60 56V76M60 76L51 67M60 76L69 67" stroke="#9E9E9E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+
+    document.getElementById("platformIcon").innerHTML = isWindows ? webviewSvg : cordovaSvg;
+
+    const params = new URLSearchParams(window.location.search);
+    const itemId = Number(params.get("id"));
+
+    // Match the array/property name used in your script.js (e.g., items or downloadableItems)
+    const list = window.items || window.downloadableItems || [];
+    const selectedItem = list.find(item => Number(item.id) === itemId);
+
+    const titleEl = document.getElementById("itemTitle");
+    const fill = document.getElementById("progressFill");
+    const percentText = document.getElementById("percentText");
+    const statusText = document.getElementById("statusText");
+    const backBtn = document.getElementById("backBtn");
+
+    if (!selectedItem) {
+      titleEl.textContent = "Item Not Found";
+      statusText.textContent = "Invalid download ID.";
+      backBtn.style.display = "inline-block";
+    } else {
+      // Adjust .title / .name and .url / .link to match your object keys in script.js
+      titleEl.textContent = selectedItem.title || selectedItem.name || `Item #${itemId}`;
+      const downloadUrl = selectedItem.url || selectedItem.link || selectedItem.downloadUrl;
+
+      let progress = 0;
+      const timer = setInterval(() => {
+        if (progress < 90) {
+          progress += Math.floor(Math.random() * 14) + 6;
+          if (progress > 90) progress = 90;
+          fill.style.width = progress + "%";
+          percentText.textContent = progress + "%";
+        }
+      }, 180);
+
+      setTimeout(() => {
+        clearInterval(timer);
+        fill.style.width = "100%";
+        percentText.textContent = "100%";
+        statusText.textContent = "Starting download...";
+        backBtn.style.display = "inline-block";
+
+        window.location.href = downloadUrl;
+      }, 1400);
+    }
+  </script>
+</body>
+</html>
