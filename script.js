@@ -373,3 +373,171 @@ function removeFromLocals(itemId) {
 applyFiltersAndRender();
 console.log("✅ Daelan's Downloadable Website loaded!");
 console.log("🛡️ Safety active — script/program files blocked");
+
+// === DAELAN'S DOWNLOADABLE WEBSITE — PART 2 ===
+function handleDownload(itemId) {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+
+    const isLocal = getSavedLocals().includes(item.id);
+
+    if (!isLocal && !navigator.onLine) {
+        alert("Offline Error: This item has a Server tag and requires Wi-Fi or Data. Tap + Add to Locals while online to download it offline!");
+        return;
+    }
+
+    const history = getDownloadHistory();
+    history.unshift({
+        id: item.id,
+        title: item.title,
+        source: isLocal ? "Local" : "Server",
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+    localStorage.setItem("daelan-download-history", JSON.stringify(history.slice(0, 30)));
+
+    // Open the Cordova / WebView2 loader screen with this item's ID
+    window.location.href = `download.html?id=${item.id}`;
+}
+
+const categoriesBtn = document.getElementById('categories-toggle-btn');
+const categoriesMenu = document.getElementById('categories-menu');
+
+if (categoriesBtn && categoriesMenu) {
+    categoriesBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        categoriesMenu.classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+        categoriesMenu.classList.remove('show');
+    });
+}
+
+function filterBySource(source) {
+    currentSourceFilter = source;
+    applyFiltersAndRender();
+}
+
+function filterByFileType(category) {
+    currentCategoryFilter = category;
+    applyFiltersAndRender();
+}
+
+function resetFilters() {
+    currentSourceFilter = "all";
+    currentCategoryFilter = "all";
+    currentSearchQuery = "";
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = "";
+    applyFiltersAndRender();
+}
+
+function updateFilterBar() {
+    const bar = document.getElementById('active-filter-bar');
+    const label = document.getElementById('filter-label');
+    if (!bar || !label) return;
+
+    if (currentSourceFilter === "all" && currentCategoryFilter === "all") {
+        bar.style.display = "none";
+    } else {
+        bar.style.display = "inline-flex";
+        label.innerText = "Source: " + currentSourceFilter.toUpperCase() + " | Type: " + currentCategoryFilter.toUpperCase();
+    }
+}
+
+const searchInputEl = document.getElementById('search-input');
+if (searchInputEl) {
+    searchInputEl.addEventListener('input', (e) => {
+        currentSearchQuery = e.target.value.toLowerCase().trim();
+        applyFiltersAndRender();
+    });
+}
+
+const modal = document.getElementById('mydownloads-modal');
+const openModalBtn = document.getElementById('open-mydownloads-btn');
+const closeModalBtn = document.getElementById('close-mydownloads-btn');
+let activeModalTab = "downloads";
+
+if (openModalBtn && modal) {
+    openModalBtn.addEventListener('click', () => {
+        modal.style.display = "flex";
+        renderModalContent();
+    });
+}
+
+if (closeModalBtn && modal) {
+    closeModalBtn.addEventListener('click', () => {
+        modal.style.display = "none";
+    });
+}
+
+function switchModalTab(tab) {
+    activeModalTab = tab;
+    document.getElementById('tab-downloads').classList.toggle('active', tab === "downloads");
+    document.getElementById('tab-locals').classList.toggle('active', tab === "locals");
+    renderModalContent();
+}
+
+function renderModalContent() {
+    const container = document.getElementById('modal-list-container');
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (activeModalTab === "downloads") {
+        const history = getDownloadHistory();
+        if (history.length === 0) {
+            container.innerHTML = '<p style="color:#94A3B8; text-align:center; padding:20px;">No downloads recorded yet.</p>';
+            return;
+        }
+        history.forEach(entry => {
+            container.innerHTML += '<div class="modal-item">' +
+                '<div class="modal-item-info">' +
+                    '<h4>' + entry.title + '</h4>' +
+                    '<span>Downloaded via ' + entry.source + ' at ' + entry.time + '</span>' +
+                '</div>' +
+                '<button class="btn-download" style="width:auto; padding:6px 14px; font-size:12px;" onclick="handleDownload(' + entry.id + ')">Download Again</button>' +
+            '</div>';
+        });
+    } else {
+        const localIds = getSavedLocals();
+        if (localIds.length === 0) {
+            container.innerHTML = '<p style="color:#94A3B8; text-align:center; padding:20px;">No Local files saved yet. Tap "+ Add to Locals" on any item to store a copy offline.</p>';
+            return;
+        }
+        localIds.forEach(id => {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            container.innerHTML += '<div class="modal-item">' +
+                '<div class="modal-item-info">' +
+                    '<h4>' + item.title + '</h4>' +
+                    '<span>' + (item.category || 'File') + ' • ' + item.fileSize + ' (Offline Ready)</span>' +
+                '</div>' +
+                '<div style="display:flex; gap:6px;">' +
+                    '<button class="btn-download" style="width:auto; padding:6px 12px; font-size:12px;" onclick="handleDownload(' + item.id + ')">Download</button>' +
+                    '<button class="btn-remove-local" onclick="removeFromLocals(' + item.id + ')">Remove</button>' +
+                '</div>' +
+            '</div>';
+        });
+    }
+}
+
+function removeFromLocals(itemId) {
+    const item = items.find(i => i.id === itemId);
+    const updated = getSavedLocals().filter(id => id !== itemId);
+    localStorage.setItem("daelan-saved-locals", JSON.stringify(updated));
+
+    if (item && navigator.serviceWorker && navigator.serviceWorker.controller) {
+        const urlsToRemove = item.downloadLinks.map(l => l.url);
+        if (item.thumbnail) urlsToRemove.push(item.thumbnail);
+
+        navigator.serviceWorker.controller.postMessage({
+            type: "REMOVE_LOCAL_ITEM",
+            urls: urlsToRemove
+        });
+    }
+    renderModalContent();
+    applyFiltersAndRender();
+}
+
+console.log("✅ Daelan's Downloadable Website loaded!");
+console.log("🛡️ Safety active — script/program files blocked");
