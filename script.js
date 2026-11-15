@@ -218,7 +218,16 @@ function handleDownload(itemId) {
     });
     localStorage.setItem("daelan-download-history", JSON.stringify(history.slice(0, 30)));
 
-    window.location.href = `download.html?id=${item.id}`;
+    item.downloadLinks.forEach(link => {
+        if (isFileSafe(link.name)) {
+            const a = document.createElement('a');
+            a.href = link.url;
+            a.download = link.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    });
 }
 
 const categoriesBtn = document.getElementById('categories-toggle-btn');
