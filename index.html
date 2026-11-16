@@ -89,7 +89,7 @@
       else if (/Win/.test(ua)) os = "Windows";
       else if (/Mac/.test(ua)) os = "MacOS";
 
-      const isApp = window.matchMedia('(display-mode: standalone)').matches;
+      const isApp = window.matchMedia('(display-mode: standalone)').matches || !!window.cordova || /; wv\)/.test(ua);
       const mode = isApp ? "Installed App" : "Browser";
       const deviceEl = document.getElementById('debug-device');
       if (deviceEl) deviceEl.innerText = `${os} (${mode})`;
