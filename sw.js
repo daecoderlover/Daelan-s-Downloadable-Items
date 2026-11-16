@@ -2,12 +2,15 @@ const CACHE_NAME = "v1.3.6.1";
 const OFFLINE_CACHE = "daelan-offline-locals-v1";
 const CORE_ASSETS = [
   "./",
-  "./#",
   "./index.html",
   "./style.css",
   "./script.js",
+  "./loader-hook.js",
+  "./download.html",
   "./manifest.json",
-  "./gem192.png"
+  "./gem192.png",
+  "./Daelan_0_web/assets/cordova.png",
+  "./Daelan_0_web/assets/webview.png"
 ];
 
 // Install: cache core page assets
@@ -32,7 +35,6 @@ self.addEventListener("activate", (event) => {
     .then(() => self.clients.claim())
     .then(() => self.clients.matchAll({ type: "window" }))
     .then(clients => {
-      // Loop through open app windows and send the new version tag
       clients.forEach(client => {
         client.postMessage({
           type: "VERSION_UPDATE",
@@ -82,7 +84,7 @@ self.addEventListener("fetch", (event) => {
         if (cachedLocalFile) {
           return cachedLocalFile;
         }
-        return fetch(event.request).catch(() => caches.match(event.request));
+        return fetch(event.request).catch(() => caches.match(event.request, { ignoreSearch: true }));
       });
     })
   );
