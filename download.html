@@ -30,9 +30,10 @@
       align-items: center;
       justify-content: center;
     }
-    .icon-box svg {
+    .icon-box img {
       width: 100%;
       height: 100%;
+      object-fit: contain;
     }
     .item-title {
       font-size: 16px;
@@ -81,7 +82,9 @@
 </head>
 <body>
 
-  <div class="icon-box" id="platformIcon"></div>
+  <div class="icon-box">
+    <img id="platformImg" src="assets/cordova.png" alt="Loading..." />
+  </div>
   <div class="item-title" id="itemTitle">Preparing file...</div>
 
   <div class="progress-track">
@@ -93,40 +96,19 @@
 
   <button class="back-btn" id="backBtn" onclick="window.location.href='index.html'">← Back to Downloads</button>
 
-  <!-- Load your existing script.js containing items 1, 2, 3, 4 -->
   <script src="script.js"></script>
 
   <script>
-    const isWindows = navigator.userAgent.includes("Windows");
-
-    // Gray Cordova Bot SVG (for Android APK)
-    const cordovaSvg = `
-      <svg viewBox="0 0 120 120" fill="none" xmlns="http://w3.org">
-        <path d="M35 16H85L104 52L94 104H76L73 90H47L44 104H26L16 52L35 16Z" fill="#9E9E9E"/>
-        <path d="M40 34H51V41H69V34H80L88 54L82 80H38L32 54L40 34Z" fill="#FFFFFF"/>
-        <ellipse cx="48" cy="60" rx="3.5" ry="7" fill="#9E9E9E"/>
-        <ellipse cx="72" cy="60" rx="3.5" ry="7" fill="#9E9E9E"/>
-      </svg>`;
-
-    // Gray WebView2 Window SVG (for Windows EXE)
-    const webviewSvg = `
-      <svg viewBox="0 0 120 120" fill="none" xmlns="http://w3.org">
-        <rect x="16" y="22" width="88" height="76" rx="12" fill="#9E9E9E"/>
-        <circle cx="31" cy="35" r="3.5" fill="#FFFFFF"/>
-        <circle cx="42" cy="35" r="3.5" fill="#FFFFFF"/>
-        <circle cx="53" cy="35" r="3.5" fill="#FFFFFF"/>
-        <rect x="24" y="46" width="72" height="44" rx="6" fill="#FFFFFF"/>
-        <path d="M60 56V76M60 76L51 67M60 76L69 67" stroke="#9E9E9E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>`;
-
-    document.getElementById("platformIcon").innerHTML = isWindows ? webviewSvg : cordovaSvg;
+    const platformImg = document.getElementById("platformImg");
+    if (navigator.userAgent.includes("Windows")) {
+      platformImg.src = "assets/webview.png";
+    }
 
     const params = new URLSearchParams(window.location.search);
     const itemId = Number(params.get("id"));
 
-    // Match the array/property name used in your script.js (e.g., items or downloadableItems)
-    const list = window.items || window.downloadableItems || [];
-    const selectedItem = list.find(item => Number(item.id) === itemId);
+    // Read 'items' directly from script.js
+    const selectedItem = items.find(item => Number(item.id) === itemId);
 
     const titleEl = document.getElementById("itemTitle");
     const fill = document.getElementById("progressFill");
@@ -139,9 +121,8 @@
       statusText.textContent = "Invalid download ID.";
       backBtn.style.display = "inline-block";
     } else {
-      // Adjust .title / .name and .url / .link to match your object keys in script.js
-      titleEl.textContent = selectedItem.title || selectedItem.name || `Item #${itemId}`;
-      const downloadUrl = selectedItem.url || selectedItem.link || selectedItem.downloadUrl;
+      titleEl.textContent = selectedItem.title;
+      const safeLinks = selectedItem.downloadLinks.filter(link => isFileSafe(link.name) && link.url);
 
       let progress = 0;
       const timer = setInterval(() => {
@@ -157,10 +138,22 @@
         clearInterval(timer);
         fill.style.width = "100%";
         percentText.textContent = "100%";
-        statusText.textContent = "Starting download...";
         backBtn.style.display = "inline-block";
 
-        window.location.href = downloadUrl;
+        if (safeLinks.length === 0) {
+          statusText.textContent = "Download link coming soon.";
+          return;
+        }
+
+        statusText.textContent = `Starting download (${safeLinks.length} file)...`;
+        safeLinks.forEach(link => {
+          const a = document.createElement("a");
+          a.href = link.url;
+          a.download = link.name;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        });
       }, 1400);
     }
   </script>
