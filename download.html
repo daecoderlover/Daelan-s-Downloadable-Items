@@ -153,6 +153,16 @@
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
+if (/Android/i.test(navigator.userAgent)) {
+  window.open(link.url, "_system");
+} else {
+  const a = document.createElement("a");
+  a.href = link.url;
+  a.download = link.name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
         });
       }, 1400);
     }
