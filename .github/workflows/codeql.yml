@@ -4,9 +4,9 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "files_for_download" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "files_for_download ]
 
 jobs:
   analyze:
