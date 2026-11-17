@@ -13,8 +13,8 @@ const items = [
         fileSize: "28.26 MB",
         dateCreated: "2026-09-25",
         downloadLinks: [
-            { url: "assets/Win12_Build.daex", name: "Win12_Build.daex" },
-            { url: "assets/Win12_Build.daex", name: "Win12_Build.dae" }
+            { url: "https://githubusercontent.com", name: "Win12_Build.daex" },
+            { url: "https://githubusercontent.com", name: "Win12_Build.dae" }
         ],
         featured: true
     },
