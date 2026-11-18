@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: 'Version Name shown in Android App Info (numbers only, e.g., 1.3.4)'
+        description: 'Version Name shown in Android App Info (numbers only, e.g., 1.3.7)'
         required: true
-        default: '1.3.4'
+        default: '1.3.7'
       version_code:
-        description: 'Version Code integer (must increase every build, e.g., 9)'
+        description: 'Version Code integer (must increase every build, e.g., 12)'
         required: true
-        default: '9'
+        default: '12'
 
 permissions:
   contents: write
@@ -43,7 +43,7 @@ jobs:
       - name: Create & Build Android Wrapper
         run: |
           CLEAN_VERSION=$(echo "${{ github.event.inputs.version_name }}" | grep -oE '[0-9]+(\.[0-9]+)*' | head -n 1)
-          if [ -z "$CLEAN_VERSION" ]; then CLEAN_VERSION="1.3.6"; fi
+          if [ -z "$CLEAN_VERSION" ]; then CLEAN_VERSION="1.3.7"; fi
 
           cordova create app_wrapper io.github.daecoderlover.daelansitems "DaelansDownloads"
           
@@ -65,12 +65,14 @@ jobs:
               <content src="https://daecoderlover.github.io/Daelan-s-Downloadable-Items/" />
               ${ICON_TAG}
               <access origin="*" />
+              <allow-navigation href="https://daecoderlover.github.io/*" />
+              <allow-intent href="http://*/*" />
               <allow-intent href="https://*/*" />
               <preference name="Fullscreen" value="false" />
               <preference name="Orientation" value="default" />
               <preference name="AndroidInsecureFileModeEnabled" value="true" />
           </widget>
-                              EOF
+          EOF
 
           cordova platform add android@13.0.0
           cordova plugin add cordova-plugin-inappbrowser
