@@ -43,7 +43,7 @@ jobs:
       - name: Create & Build Android Wrapper
         run: |
           CLEAN_VERSION=$(echo "${{ github.event.inputs.version_name }}" | grep -oE '[0-9]+(\.[0-9]+)*' | head -n 1)
-          if [ -z "$CLEAN_VERSION" ]; then CLEAN_VERSION="1.3.4"; fi
+          if [ -z "$CLEAN_VERSION" ]; then CLEAN_VERSION="1.3.6"; fi
 
           cordova create app_wrapper io.github.daecoderlover.daelansitems "DaelansDownloads"
           
@@ -65,12 +65,14 @@ jobs:
               <content src="https://daecoderlover.github.io/Daelan-s-Downloadable-Items/" />
               ${ICON_TAG}
               <access origin="*" />
-              <allow-navigation href="*" />
+              <allow-intent href="https://*/*" />
               <preference name="Fullscreen" value="false" />
               <preference name="Orientation" value="default" />
               <preference name="AndroidInsecureFileModeEnabled" value="true" />
           </widget>
           EOF
+          cordova plugin add cordova-plugin-inappbrowser
+
 
           cordova platform add android@13.0.0
           cordova build android --release -- --packageType=apk
