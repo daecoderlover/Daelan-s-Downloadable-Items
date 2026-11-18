@@ -70,11 +70,10 @@ jobs:
               <preference name="Orientation" value="default" />
               <preference name="AndroidInsecureFileModeEnabled" value="true" />
           </widget>
-          EOF
-          cordova plugin add cordova-plugin-inappbrowser
-
+                              EOF
 
           cordova platform add android@13.0.0
+          cordova plugin add cordova-plugin-inappbrowser
           cordova build android --release -- --packageType=apk
 
       - name: Sign APK with Permanent Release Keystore
