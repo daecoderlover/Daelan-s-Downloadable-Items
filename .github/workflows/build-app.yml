@@ -75,7 +75,6 @@ jobs:
           EOF
 
           cordova platform add android@13.0.0
-          cordova plugin add
           cordova build android --release -- --packageType=apk
 
       - name: Sign APK with Permanent Release Keystore
