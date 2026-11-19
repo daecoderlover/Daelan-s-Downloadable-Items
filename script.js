@@ -5,7 +5,7 @@ const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.ps1', '.vbs', '.jse', '.ws
 const items = [
     {
         id: 1,
-        title: "Windows 12 Presentation Pack",
+        title: "Windows 12 Presentation Pack DAEX",
         description: "Complete presentation show showcasing Windows 12 editions, launcher designs, and UI concepts",
         category: "Archives",
         thumbnail: "assets/Win12_Launcher_Preview_Video.mp4",
@@ -13,13 +13,26 @@ const items = [
         fileSize: "28.26 MB",
         dateCreated: "2026-09-25",
         downloadLinks: [
-            { url: "https://github.com/daecoderlover/Daelan-s-Downloadable-Items/raw/refs/heads/files_for_download/assets/Win12_Build.daex", name: "Win12_Build.daex" },
-            { url: "https://github.com/daecoderlover/Daelan-s-Downloadable-Items/raw/refs/heads/files_for_download/assets/Win12_Build.dae", name: "Win12_Build.dae" }
+            { url: "https://github.com/daecoderlover/Daelan-s-Downloadable-Items/raw/refs/heads/files_for_download/assets/Win12_Build.daex", name: "Win12_Build.daex" }
         ],
         featured: true
     },
     {
         id: 2,
+        title: "Windows 12 Presentation Pack DAEa",
+        description: "Complete presentation show showcasing Windows 12 editions, launcher designs, and UI concepts",
+        category: "Archives",
+        thumbnail: "assets/Win12_Launcher_Preview_Video.mp4",
+        isVideoThumbnail: true,
+        fileSize: "28.26 MB",
+        dateCreated: "2026-09-25",
+        downloadLinks: [
+            { url: "https://github.com/daecoderlover/Daelan-s-Downloadable-Items/raw/refs/heads/files_for_download/assets/Win12_Build.dae", name: "Win12_Build.dae" }
+        ],
+        featured: true
+    },
+    {
+        id: 3,
         title: "Photo Preview",
         description: "Sample preview item — replace with your own creations",
         category: "Media",
@@ -33,7 +46,7 @@ const items = [
         featured: false
     },
     {
-        id: 3,
+        id: 4,
         title: "Video Preview",
         description: "Video showcase of upcoming content from Daelan's studio",
         category: "Media",
@@ -47,7 +60,7 @@ const items = [
         featured: false
     },
     {
-        id: 4,
+        id: 5,
         title: "PDF Preview",
         description: "Random PDF showcase",
         category: "Documents",
