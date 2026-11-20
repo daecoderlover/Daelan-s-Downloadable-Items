@@ -13,7 +13,8 @@ WF_NAME = os.environ.get("WF_NAME", "Manual")
 WF_STATUS = os.environ.get("WF_STATUS", "success")
 RUN_URL = os.environ.get("RUN_URL", "")
 
-CONFIG_PATH = ".github/workflows/config.xml"
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.xml")
+
 
 def gh_api(endpoint, method="GET", data=None):
     url = "https://api." + "github.com" + endpoint if endpoint.startswith("/") else endpoint
@@ -32,6 +33,7 @@ def gh_api(endpoint, method="GET", data=None):
         print(f"GITHUB API ERROR {e.code} on {url}: {err_body}")
         raise
 
+
 def get_codeql_details():
     try:
         alerts = gh_api(f"/repos/{REPO}/code-scanning/alerts?state=open&per_page=5")
@@ -46,10 +48,10 @@ def get_codeql_details():
     except Exception:
         return "Syntax error or dangerous code flagged during CodeQL scan."
 
+
 def post_issue(issue_num, body):
     num_str = str(issue_num).strip().lower()
 
-    # If set to "auto" (or "0" or blank), ALWAYS create a brand-new Issue
     if num_str in ("", "0", "auto"):
         title = f"🤖 daelan-bot: {WF_NAME} ({WF_STATUS})" if WF_NAME != "Manual" else f"🤖 daelan-bot Announcement ({BRANCH})"
         res = gh_api(f"/repos/{REPO}/issues", method="POST", data={
@@ -58,7 +60,6 @@ def post_issue(issue_num, body):
         })
         print(f"Created brand-new Issue #{res['number']}")
     else:
-        # Only comment if you explicitly typed a specific Issue number (like 1 or 2)
         gh_api(f"/repos/{REPO}/issues/{num_str}/comments", method="POST", data={"body": body})
         print(f"Commented on Issue #{num_str}")
 
@@ -66,7 +67,6 @@ def post_issue(issue_num, body):
 def post_discussion(disc_num, body):
     num_str = str(disc_num).strip().lower()
 
-    # If set to "auto" (or "0" or blank), ALWAYS create a brand-new Discussion
     if num_str in ("", "0", "auto"):
         query_repo = """
         query($owner: String!, $repo: String!) {
@@ -106,7 +106,6 @@ def post_discussion(disc_num, body):
         new_d = created["data"]["createDiscussion"]["discussion"]
         print(f"Created brand-new Discussion #{new_d['number']}")
     else:
-        # Only comment if you explicitly typed a specific Discussion number
         query_id = """
         query($owner: String!, $repo: String!, $num: Int!) {
           repository(owner: $owner, name: $repo) {
@@ -133,6 +132,7 @@ def post_discussion(disc_num, body):
         })
         print(f"Commented on Discussion #{num_str}")
 
+
 def execute_action(target_type, number, branch, raw_msg, attach_file):
     details = get_codeql_details() if "codeql" in WF_NAME.lower() else f"Status: {WF_STATUS}"
     body = (
@@ -155,10 +155,7 @@ def execute_action(target_type, number, branch, raw_msg, attach_file):
     elif target_type == "Compare Branches":
         compare_url = f"https://github.com{REPO}/compare/main...{branch}"
         full_msg = f"{body}\n\n🔀 **Compare Branches:** [main ↔ {branch}]({compare_url})"
-        if str(number).isdigit() and int(number) > 0:
-            post_discussion(number, full_msg)
-        else:
-            print(f"Generated Compare URL: {compare_url}")
+        post_discussion(number, full_msg)
 
 
 def save_to_xml(branch, target_type, number, message, attach_file):
