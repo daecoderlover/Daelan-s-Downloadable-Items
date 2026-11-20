@@ -22,7 +22,7 @@ on:
       thread_number:
         description: 'Issue or Discussion Number (e.g., 1)'
         required: false
-        default: '1'
+        default: 'auto'
         type: string
       message:
         description: 'Message (Markdown supported)'
