@@ -20,8 +20,17 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout Repository
+      - name: Generate daelan-bot Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: Checkout Repository as daelan-bot
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -93,11 +102,11 @@ jobs:
             --key-pass pass:"${{ secrets.KEY_PASSWORD }}" \
             --out "DaelansDownloads.apk" "$ALIGNED_APK"
 
-      - name: Save DaelansDownloads.apk Directly into Repository
+      - name: Save DaelansDownloads.apk Directly into Repository as daelan-bot
         run: |
           rm -rf app_wrapper release.keystore DaelansDownloads-aligned.apk
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "daelan-bot[bot]"
+          git config user.email "5843671+daelan-bot[bot]@users.noreply.github.com"
           git add DaelansDownloads.apk
           git commit -m "Build DaelansDownloads.apk v${{ github.event.inputs.version_name }}" || exit 0
           git push
