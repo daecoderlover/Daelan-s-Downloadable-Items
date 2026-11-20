@@ -110,3 +110,15 @@ jobs:
           git add DaelansDownloads.apk
           git commit -m "Build DaelansDownloads.apk v${{ github.event.inputs.version_name }}" || exit 0
           git push
+
+      - name: Announce APK Build Result via daelan-bot
+        if: always()
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          EVENT_NAME: workflow_run
+          TARGET_BRANCH: ${{ github.ref_name }}
+          WF_NAME: Build Native Android APK
+          WF_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python3 .github/workflows/bot_brain.py
+   
