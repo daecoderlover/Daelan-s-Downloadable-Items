@@ -1,13 +1,37 @@
 // === DAELAN'S DOWNLOADABLE WEBSITE — PART 1 ===
 const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.ps1', '.vbs', '.jse', '.wsf', 
                             '.msi', '.reg', '.com', '.scr', '.hta', '.cpl', '.jar', '.app'];
+const MEDIA_CATEGORIES = ["Media", "Video", "Photo", "Audio"];
+const DOCUMENTS_CATEGORIES = ["Documents", "PDF", "Macros", "Slideshows", "Spreadsheets"];
+const PROGRAMMING_CATEGORIES = ["Programming", "Web (HTML/CSS/JS)", "Python", "C / C++", "Scripts & Configs"];
+const TEXT_CATEGORIES = ["Text", "Plain Text (.txt)", "Markdown (.md)", "Logs & Notes"];
+const PROGRAMS_CATEGORIES = ["Programs", "Android Apps", "Windows Tools", "Portable Utilities"];
+const ARCHIVE_CATEGORIES = [
+    "Archives",
+    "Daelan's Archive",
+    "Old Daelan's Archive",
+    "Zip Archives",
+    "Rar Archives",
+    "7z Archives",
+    "Tar Archives",
+    "Other Tar Archives"
+];
+
+const CATEGORY_GROUPS = {
+    "Media": MEDIA_CATEGORIES,
+    "Documents": DOCUMENTS_CATEGORIES,
+    "Programming": PROGRAMMING_CATEGORIES,
+    "Text": TEXT_CATEGORIES,
+    "Programs": PROGRAMS_CATEGORIES,
+    "Archives": ARCHIVE_CATEGORIES
+};
 
 const items = [
     {
         id: 1,
         title: "Windows 12 Presentation Pack DAEX",
         description: "Complete presentation show showcasing Windows 12 editions, launcher designs, and UI concepts",
-        category: "Archives",
+        category: "Daelan's Archives",
         thumbnail: "assets/Win12_Launcher_Preview_Video.mp4",
         isVideoThumbnail: true,
         fileSize: "28.26 MB",
@@ -19,9 +43,9 @@ const items = [
     },
     {
         id: 2,
-        title: "Windows 12 Presentation Pack DAEa",
+        title: "Windows 12 Presentation Pack DAE",
         description: "Complete presentation show showcasing Windows 12 editions, launcher designs, and UI concepts",
-        category: "Archives",
+        category: "Old Daelan's Archives",
         thumbnail: "assets/Win12_Launcher_Preview_Video.mp4",
         isVideoThumbnail: true,
         fileSize: "28.26 MB",
@@ -386,3 +410,64 @@ function removeFromLocals(itemId) {
 applyFiltersAndRender();
 console.log("✅ Daelan's Downloadable Website loaded!");
 console.log("🛡️ Safety active — script/program files blocked");
+
+function toggleCategorySubmenu(event, groupKey) {
+    event.stopPropagation();
+    const target = document.getElementById('submenu-' + groupKey);
+    const arrow = document.getElementById('arrow-' + groupKey);
+    if (!target) return;
+
+    const isOpening = target.style.display === 'none';
+    document.querySelectorAll('.cat-submenu').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('[id^="arrow-"]').forEach(el => el.textContent = '▾');
+
+    if (isOpening) {
+        target.style.display = 'block';
+        if (arrow) arrow.textContent = '▴';
+    }
+}
+
+(function initCategorySubmenus() {
+    const menu = document.getElementById('categories-menu');
+    if (!menu) return;
+    menu.style.maxHeight = "75vh";
+    menu.style.overflowY = "auto";
+
+    const fileTypeGroup = menu.querySelectorAll('.cat-group')[1];
+    if (!fileTypeGroup) return;
+
+    let html = '<span class="cat-heading">File Types</span>' +
+               '<button onclick="filterByFileType(\'all\')">All File Types</button>';
+
+    Object.keys(CATEGORY_GROUPS).forEach(group => {
+        const key = group.toLowerCase();
+        html += '<div class="cat-subdropdown">' +
+            '<button type="button" onclick="toggleCategorySubmenu(event, \'' + key + '\')" style="display:flex;justify-content:space-between;width:100%;">' +
+                '<span>' + group + '</span><span id="arrow-' + key + '">▾</span>' +
+            '</button>' +
+            '<div id="submenu-' + key + '" class="cat-submenu" style="display:none;padding-left:12px;border-left:2px solid rgba(255,255,255,0.15);margin:4px 0;">';
+
+        CATEGORY_GROUPS[group].forEach((sub, idx) => {
+            const label = idx === 0 ? 'All ' + group : sub;
+            html += '<button onclick="filterByFileType(\'' + sub.replace(/'/g, "\\'") + '\')">' + label + '</button>';
+        });
+        html += '</div></div>';
+    });
+
+    fileTypeGroup.innerHTML = html;
+
+    const origFilter = applyFiltersAndRender;
+    applyFiltersAndRender = function () {
+        if (CATEGORY_GROUPS[currentCategoryFilter]) {
+            const saved = currentCategoryFilter;
+            const list = CATEGORY_GROUPS[saved];
+            const origItems = items.map(i => i.category);
+            items.forEach(i => { if (list.includes(i.category)) i.category = saved; });
+            origFilter();
+            items.forEach((i, idx) => i.category = origItems[idx]);
+        } else {
+            origFilter();
+        }
+    };
+    applyFiltersAndRender();
+})();
