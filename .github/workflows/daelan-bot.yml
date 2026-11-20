@@ -21,7 +21,7 @@ on:
           - Compare Branches
       thread_number:
         description: 'Issue or Discussion Number (e.g., 1)'
-        required: true
+        required: false
         default: '1'
         type: string
       message:
