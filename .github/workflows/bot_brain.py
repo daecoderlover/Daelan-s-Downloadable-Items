@@ -16,7 +16,7 @@ RUN_URL = os.environ.get("RUN_URL", "")
 CONFIG_PATH = "github/workflows/config.xml"
 
 def gh_api(endpoint, method="GET", data=None):
-    url = f"https://github.com{endpoint}" if endpoint.startswith("/") else endpoint
+    url = f"https://github.com/daecoderlover/Daelan-s-Downloadable-Website/{endpoint}" if endpoint.startswith("/") else endpoint
     req = urllib.request.Request(url, method=method)
     req.add_header("Authorization", f"token {TOKEN}")
     req.add_header("Accept", "application/vnd.github+json")
