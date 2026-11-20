@@ -17,7 +17,7 @@ CONFIG_PATH = "config.xml"
 
 
 def gh_api(endpoint, method="GET", data=None):
-    url = f"https://github.com{endpoint}" if endpoint.startswith("/") else endpoint
+    url = f"https://github.com/daecoderlover/Daelan-s-Downloadable-Website/{endpoint}" if endpoint.startswith("/") else endpoint
     req = urllib.request.Request(url, method=method)
     req.add_header("Authorization", f"Bearer {TOKEN}")
     req.add_header("Accept", "application/vnd.github+json")
@@ -43,24 +43,96 @@ def get_codeql_details():
         return "Syntax error or dangerous code flagged during CodeQL scan."
 
 
+def get_latest_issue_number():
+    issues = gh_api(f"/repos/{REPO}/issues?state=open&per_page=10")
+    for item in issues:
+        if "pull_request" not in item:
+            return item["number"]
+    return None
+
+
 def post_issue(issue_num, body):
-    gh_api(f"/repos/{REPO}/issues/{issue_num}/comments", method="POST", data={"body": body})
-    print(f"Posted to Issue #{issue_num}")
+    num_str = str(issue_num).strip().lower()
+    target_num = None if num_str in ("", "0", "auto") else int(num_str)
+
+    if target_num is None:
+        target_num = get_latest_issue_number()
+
+    if target_num is None:
+        res = gh_api(f"/repos/{REPO}/issues", method="POST", data={
+            "title": "daelan-bot Status & Alerts",
+            "body": body
+        })
+        print(f"Created new Issue #{res['number']}")
+    else:
+        gh_api(f"/repos/{REPO}/issues/{target_num}/comments", method="POST", data={"body": body})
+        print(f"Posted to Issue #{target_num}")
 
 
 def post_discussion(disc_num, body):
-    query_id = """
-    query($owner: String!, $repo: String!, $num: Int!) {
-      repository(owner: $owner, name: $repo) {
-        discussion(number: $num) { id }
-      }
-    }
-    """
-    res = gh_api("/graphql", method="POST", data={
-        "query": query_id,
-        "variables": {"owner": OWNER, "repo": REPO_NAME, "num": int(disc_num)}
-    })
-    disc_id = res["data"]["repository"]["discussion"]["id"]
+    num_str = str(disc_num).strip().lower()
+
+    if num_str in ("", "0", "auto"):
+        # Find the newest Discussion or get the first Discussion category to create one
+        query_repo = """
+        query($owner: String!, $repo: String!) {
+          repository(owner: $owner, name: $repo) {
+            id
+            discussions(first: 1, orderBy: {field: CREATED_AT, direction: DESC}) {
+              nodes { id number }
+            }
+            discussionCategories(first: 1) {
+              nodes { id }
+            }
+          }
+        }
+        """
+        res = gh_api("/graphql", method="POST", data={
+            "query": query_repo,
+            "variables": {"owner": OWNER, "repo": REPO_NAME}
+        })
+        repo_data = res["data"]["repository"]
+        existing = repo_data["discussions"]["nodes"]
+
+        if existing:
+            disc_id = existing[0]["id"]
+            disc_number = existing[0]["number"]
+        else:
+            repo_id = repo_data["id"]
+            cat_id = repo_data["discussionCategories"]["nodes"][0]["id"]
+            create_mut = """
+            mutation($repoId: ID!, $catId: ID!, $title: String!, $body: String!) {
+              createDiscussion(input: {repositoryId: $repoId, categoryId: $catId, title: $title, body: $body}) {
+                discussion { id number }
+              }
+            }
+            """
+            created = gh_api("/graphql", method="POST", data={
+                "query": create_mut,
+                "variables": {
+                    "repoId": repo_id,
+                    "catId": cat_id,
+                    "title": "daelan-bot Updates & Reports",
+                    "body": body
+                }
+            })
+            new_d = created["data"]["createDiscussion"]["discussion"]
+            print(f"Created new Discussion #{new_d['number']}")
+            return
+    else:
+        query_id = """
+        query($owner: String!, $repo: String!, $num: Int!) {
+          repository(owner: $owner, name: $repo) {
+            discussion(number: $num) { id }
+          }
+        }
+        """
+        res = gh_api("/graphql", method="POST", data={
+            "query": query_id,
+            "variables": {"owner": OWNER, "repo": REPO_NAME, "num": int(num_str)}
+        })
+        disc_id = res["data"]["repository"]["discussion"]["id"]
+        disc_number = num_str
 
     mutation = """
     mutation($id: ID!, $body: String!) {
@@ -73,8 +145,7 @@ def post_discussion(disc_num, body):
         "query": mutation,
         "variables": {"id": disc_id, "body": body}
     })
-    print(f"Posted to Discussion #{disc_num}")
-
+    print(f"Posted to Discussion #{disc_number}")
 
 def execute_action(target_type, number, branch, raw_msg, attach_file):
     details = get_codeql_details() if "codeql" in WF_NAME.lower() else f"Status: {WF_STATUS}"
