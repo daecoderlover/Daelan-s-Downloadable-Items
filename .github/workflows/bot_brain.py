@@ -13,7 +13,7 @@ WF_NAME = os.environ.get("WF_NAME", "Manual")
 WF_STATUS = os.environ.get("WF_STATUS", "success")
 RUN_URL = os.environ.get("RUN_URL", "")
 
-CONFIG_PATH = "github/workflows/config.xml"
+CONFIG_PATH = ".github/workflows/config.xml"
 
 def gh_api(endpoint, method="GET", data=None):
     url = "https://api." + "github.com" + endpoint if endpoint.startswith("/") else endpoint
