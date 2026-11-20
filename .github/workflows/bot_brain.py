@@ -15,18 +15,22 @@ RUN_URL = os.environ.get("RUN_URL", "")
 
 CONFIG_PATH = "github/workflows/config.xml"
 
-
 def gh_api(endpoint, method="GET", data=None):
-    url = f"https://github.com/daecoderlover/Daelan-s-Downloadable-Website/{endpoint}" if endpoint.startswith("/") else endpoint
+    url = f"https://github.com{endpoint}" if endpoint.startswith("/") else endpoint
     req = urllib.request.Request(url, method=method)
-    req.add_header("Authorization", f"Bearer {TOKEN}")
+    req.add_header("Authorization", f"token {TOKEN}")
     req.add_header("Accept", "application/vnd.github+json")
+    req.add_header("User-Agent", "daelan-bot")
     if data:
         req.add_header("Content-Type", "application/json")
         req.data = json.dumps(data).encode("utf-8")
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read().decode("utf-8"))
-
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode("utf-8")
+        print(f"GITHUB API ERROR {e.code} on {url}: {err_body}")
+        raise
 
 def get_codeql_details():
     try:
