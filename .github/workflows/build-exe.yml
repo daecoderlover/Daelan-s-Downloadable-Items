@@ -15,8 +15,17 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - name: Checkout Repository
+      - name: Generate daelan-bot Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: Checkout Repository as daelan-bot
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up .NET 8
         uses: actions/setup-dotnet@v4
@@ -132,7 +141,7 @@ jobs:
                       webView = new WebView2
                       {
                           Dock = DockStyle.Fill,
-                          Source = new Uri("https://github.io")
+                          Source = new Uri("https://github.com/daecoderlover/Daelan-s-Downloadable-items/")
                       };
 
                       this.Controls.Add(webView);
@@ -168,12 +177,12 @@ jobs:
             Write-Warning "EXE is $sizeMB MB (>= 100MB GitHub repo limit). Publishing to GitHub Releases instead."
           }
 
-      - name: Save DaelansDownloads.exe Directly into Repository
+      - name: Save DaelansDownloads.exe Directly into Repository as daelan-bot
         if: steps.prep_exe.outputs.can_commit == 'true'
         shell: pwsh
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "daelan-bot[bot]"
+          git config user.email "5843671+daelan-bot[bot]@users.noreply.github.com"
           git add -f DaelansDownloads.exe
 
           $changes = git status --porcelain DaelansDownloads.exe
@@ -187,9 +196,11 @@ jobs:
             Write-Host "No changes to DaelansDownloads.exe to commit."
           }
 
-      - name: Upload EXE to GitHub Release (Fallback if >= 100MB)
+      - name: Upload EXE to GitHub Release as daelan-bot (Fallback if >= 100MB)
         if: steps.prep_exe.outputs.can_commit == 'false'
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         with:
           tag_name: "v${{ github.event.inputs.version_name }}"
           name: "Daelan's Downloads v${{ github.event.inputs.version_name }}"
