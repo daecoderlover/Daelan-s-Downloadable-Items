@@ -84,7 +84,7 @@ def post_discussion(disc_num, body):
         })
         repo_data = res["data"]["repository"]
         repo_id = repo_data["id"]
-        cat_id = repo_data["discussionCategories"]["nodes"]["id"]
+        cat_id = next(iter(repo_data["discussionCategories"]["nodes"]))["id"]
         title = f"📦 {WF_NAME} — {BRANCH}" if WF_NAME != "Manual" else f"📢 daelan-bot Update ({BRANCH})"
 
         create_mut = """
