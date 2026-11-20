@@ -73,7 +73,7 @@ jobs:
           INPUT_MESSAGE: ${{ inputs.message }}
           INPUT_ATTACH: ${{ inputs.attach_file }}
           INPUT_SAVE: ${{ inputs.save_to_config }}
-        run: python3 .github/scripts/bot_brain.py
+        run: python3 .github/workflows/bot_brain.py
 
       - name: Commit updated config.xml as daelan-bot
         if: inputs.save_to_config == true
