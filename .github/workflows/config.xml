@@ -4,7 +4,7 @@
     <rule id="codeql-alert" workflow="CodeQL" status="failure">
         <branch>all</branch>
         <type>Issues</type>
-        <number>1</number>
+        <number>auto</number>
         <attach_file></attach_file>
         <message><![CDATA[
 🚨 **Security & Syntax Alert from daelan-bot!**
@@ -18,7 +18,7 @@
     <rule id="all-good" workflow="any" status="success">
         <branch>all</branch>
         <type>Discussions</type>
-        <number>2</number>
+        <number>auto</number>
         <attach_file></attach_file>
         <message><![CDATA[
 ✅ **Great News!**
@@ -28,10 +28,10 @@ Workflow **{workflow}** completed cleanly on `{branch}` with zero errors!
     </rule>
 
     <!-- Rule 3: Compare branches announcement -->
-    <rule id="branch-sync" workflow="build-app" status="success">
+    <rule id="branch-sync" workflow="any" status="success">
         <branch>files_for_download</branch>
         <type>Compare Branches</type>
-        <number>0</number>
+        <number>auto</number>
         <attach_file></attach_file>
         <message><![CDATA[
 📦 New build ready on `files_for_download`! Compare changes against `main` before downloading.
