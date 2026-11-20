@@ -39,7 +39,7 @@ on:
         type: boolean
 
   workflow_run:
-    workflows: ["CodeQL", "build-app", "build-exe"]
+    workflows: ["CodeQL", "Build Native Android APK", "Build Native Windows EXE"]
     types: [completed]
     branches: ['**']
 
