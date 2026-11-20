@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<daelan_bot_config>
+    <!-- Rule 1: CodeQL finds syntax errors or dangerous code -->
+    <rule id="codeql-alert" workflow="CodeQL" status="failure">
+        <branch>all</branch>
+        <type>Issues</type>
+        <number>1</number>
+        <attach_file></attach_file>
+        <message><![CDATA[
+🚨 **Security & Syntax Alert from daelan-bot!**
+**CodeQL** detected a syntax error or dangerous code on branch `{branch}`.
+- **Details:** {details}
+- **Inspect Run:** [View CodeQL Logs]({run_url})
+        ]]></message>
+    </rule>
+
+    <!-- Rule 2: Everything is great (CodeQL, build-app, or build-exe passes) -->
+    <rule id="all-good" workflow="any" status="success">
+        <branch>all</branch>
+        <type>Discussions</type>
+        <number>2</number>
+        <attach_file></attach_file>
+        <message><![CDATA[
+✅ **Great News!**
+Workflow **{workflow}** completed cleanly on `{branch}` with zero errors!
+[View Workflow Summary]({run_url})
+        ]]></message>
+    </rule>
+
+    <!-- Rule 3: Compare branches announcement -->
+    <rule id="branch-sync" workflow="build-app" status="success">
+        <branch>files_for_download</branch>
+        <type>Compare Branches</type>
+        <number>0</number>
+        <attach_file></attach_file>
+        <message><![CDATA[
+📦 New build ready on `files_for_download`! Compare changes against `main` before downloading.
+        ]]></message>
+    </rule>
+</daelan_bot_config>
