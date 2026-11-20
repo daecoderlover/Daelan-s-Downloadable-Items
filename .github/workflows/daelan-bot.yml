@@ -1,15 +1,50 @@
-name: daelan-bot Status & Custom Reporter
+name: daelan-bot Controller
 
 on:
+  workflow_dispatch:
+    inputs:
+      branch_target:
+        description: 'Branch Target'
+        required: true
+        type: choice
+        options:
+          - main
+          - files_for_download
+          - all branches
+      target_type:
+        description: 'Type'
+        required: true
+        type: choice
+        options:
+          - Issues
+          - Discussions
+          - Compare Branches
+      thread_number:
+        description: 'Issue or Discussion Number (e.g., 1)'
+        required: true
+        default: '1'
+        type: string
+      message:
+        description: 'Message (Markdown supported)'
+        required: true
+        type: string
+      attach_file:
+        description: 'Attach File path in repo (e.g., dist/app.apk or leave blank)'
+        required: false
+        type: string
+      save_to_config:
+        description: 'Save this rule into config.xml?'
+        required: true
+        default: false
+        type: boolean
+
   workflow_run:
-    workflows: ["CodeQL", "build-app", "build-exe"] # Must match the 'name:' inside those .yml files
-    types:
-      - completed
-    branches:
-      - '**' # Runs on ALL branches possible
+    workflows: ["CodeQL", "build-app", "build-exe"]
+    types: [completed]
+    branches: ['**']
 
 jobs:
-  bot-announce:
+  daelan-bot-brain:
     runs-on: ubuntu-latest
     steps:
       - name: Generate daelan-bot Token
@@ -19,66 +54,32 @@ jobs:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.PRIVATE_KEY }}
 
-      - name: Build Dynamic Message
-        id: msg
+      - name: Checkout repository as daelan-bot
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+
+      - name: Run Python Bot Brain
         env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          TARGET_BRANCH: ${{ inputs.branch_target || github.event.workflow_run.head_branch || github.ref_name }}
           WF_NAME: ${{ github.event.workflow_run.name }}
           WF_STATUS: ${{ github.event.workflow_run.conclusion }}
-          BRANCH: ${{ github.event.workflow_run.head_branch }}
           RUN_URL: ${{ github.event.workflow_run.html_url }}
-          CUSTOM_TEXT: ${{ vars.BOT_CUSTOM_COMMENT }} # Optional custom override
-        run: |
-          if [ -n "$CUSTOM_TEXT" ]; then
-            BODY="$CUSTOM_TEXT"
-          elif [ "$WF_STATUS" == "success" ]; then
-            BODY="✅ **$WF_NAME** passed on branch \`$BRANCH\`! [View Run]($RUN_URL)"
-          elif [ "$WF_STATUS" == "failure" ]; then
-            BODY="❌ **$WF_NAME** failed on branch \`$BRANCH\`. Check logs: [View Run]($RUN_URL)"
-          else
-            BODY="⚠️ **$WF_NAME** finished with status **$WF_STATUS** on branch \`$BRANCH\`. [View Run]($RUN_URL)"
-          fi
-          
-          # Save multiline-safe output
-          {
-            echo "text<<EOF"
-            echo "$BODY"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          INPUT_TYPE: ${{ inputs.target_type }}
+          INPUT_NUMBER: ${{ inputs.thread_number }}
+          INPUT_MESSAGE: ${{ inputs.message }}
+          INPUT_ATTACH: ${{ inputs.attach_file }}
+          INPUT_SAVE: ${{ inputs.save_to_config }}
+        run: python3 .github/scripts/bot_brain.py
 
-      # Post to a specific Issue (Set TARGET_ISSUE_NUMBER in Repo Variables)
-      - name: Post to Issue
-        if: vars.TARGET_ISSUE_NUMBER != ''
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          BODY: ${{ steps.msg.outputs.text }}
+      - name: Commit updated config.xml as daelan-bot
+        if: inputs.save_to_config == true
         run: |
-          gh issue comment "${{ vars.TARGET_ISSUE_NUMBER }}" \
-            --repo "${{ github.repository }}" \
-            --body "$BODY"
-
-      # OR Post to a specific Discussion (Set TARGET_DISCUSSION_NUMBER in Repo Variables)
-      - name: Post to Discussion
-        if: vars.TARGET_DISCUSSION_NUMBER != ''
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          BODY: ${{ steps.msg.outputs.text }}
-        run: |
-          DISCUSSION_ID=$(gh api graphql -f query='
-            query($owner: String!, $repo: String!, $num: Int!) {
-              repository(owner: $owner, name: $repo) {
-                discussion(number: $num) { id }
-              }
-            }' \
-            -f owner="${{ github.repository_owner }}" \
-            -f repo="${{ github.event.repository.name }}" \
-            -F num="${{ vars.TARGET_DISCUSSION_NUMBER }}" \
-            --jq '.data.repository.discussion.id')
-
-          gh api graphql -f query='
-            mutation($id: ID!, $body: String!) {
-              addDiscussionComment(input: {discussionId: $id, body: $body}) {
-                comment { id }
-              }
-            }' \
-            -f id="$DISCUSSION_ID" \
-            -f body="$BODY"
+          git config user.name "daelan-bot[bot]"
+          git config user.email "5843671+daelan-bot[bot]@://github.com"
+          git add config.xml
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore(bot): update config.xml rules"
+          git push
