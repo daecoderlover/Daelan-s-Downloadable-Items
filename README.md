@@ -45,3 +45,24 @@ Go to  **Issues** or **Discusions** to submit files — read the rules, then sen
 ## © License
 **MIT License** — Copyright © 2026 daecoderlover
 Free to use & share with credit given.
+
+---
+
+# **Logos of Daelan's Downloadable Website**
+
+<p align="center">
+  <img src="gem192.png" alt="Daelan's Diamond Logo" width="192" />
+</p>
+
+### **📦 Daelan's Downloadable Items Logo for** `Android/iOS`
+
+---
+
+<p align="center">
+  <img src="gem512.png" alt="Daelan's Diamond Logo" width="512" />
+</p>
+
+### 📦 Daelan's Downloadable Items Logo for `Windows/Linux/Mac`
+
+
+
