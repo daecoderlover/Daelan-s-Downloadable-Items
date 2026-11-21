@@ -116,6 +116,18 @@ function isFileSafe(filename) {
     return !BLOCKED_EXTENSIONS.some(ext => lower.endsWith(ext));
 }
 
+function toggleCardVideo(videoEl) {
+    if (!videoEl || videoEl.tagName !== 'VIDEO') return;
+    const playIcon = videoEl.parentElement.querySelector('.play-icon');
+    if (videoEl.paused) {
+        videoEl.play();
+        if (playIcon) playIcon.style.display = 'none';
+    } else {
+        videoEl.pause();
+        if (playIcon) playIcon.style.display = 'flex';
+    }
+}
+
 function createItemCard(item) {
     const safeLinks = item.downloadLinks.filter(link => isFileSafe(link.name));
     const unsafeLinks = item.downloadLinks.filter(link => !isFileSafe(link.name));
@@ -134,8 +146,14 @@ function createItemCard(item) {
         ? '<button class="btn-add-local saved" disabled>✓ Added to Locals</button>'
         : '<button class="btn-add-local" onclick="addToLocals(' + item.id + ', this)">+ Add to Locals</button>';
 
-    const thumbHTML = item.thumbnail ? '<img src="' + item.thumbnail + '" alt="' + item.title + '">' : '';
-    const playHTML = item.isVideoThumbnail ? '<div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>' : '';
+    const thumbHTML = item.thumbnail
+        ? (item.isVideoThumbnail
+            ? '<video src="' + item.thumbnail + '#t=0.5" muted loop playsinline preload="metadata" style="width:100%; height:100%; object-fit:cover; display:block;" onclick="toggleCardVideo(this)"></video>'
+            : '<img src="' + item.thumbnail + '" alt="' + item.title + '" style="width:100%; height:100%; object-fit:cover; display:block;">')
+        : '';
+    const playHTML = item.isVideoThumbnail
+        ? '<div class="play-icon" onclick="event.stopPropagation(); toggleCardVideo(this.parentElement.querySelector(\'video\'))" style="cursor:pointer; pointer-events:auto; z-index:5;"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>'
+        : '';
     const countText = safeLinks.length > 1 ? '(' + safeLinks.length + ' files)' : '';
     const unsafeHTML = unsafeLinks.length > 0 ? '<p style="color:#f87171;font-size:11px;margin-top:8px;">⚠️ ' + unsafeLinks.length + ' file blocked for safety</p>' : '';
 
@@ -161,6 +179,7 @@ function createItemCard(item) {
         '</div>' +
     '</div>';
 }
+
 
 function applyFiltersAndRender() {
     const grid = document.getElementById('items-grid');
