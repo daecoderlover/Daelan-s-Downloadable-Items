@@ -1,4 +1,4 @@
-const CACHE_NAME = "v1.3.8.2.1 (sw.js fix)";
+const CACHE_NAME = "v1.3.8.2.2 (sw.js fix)";
 const OFFLINE_CACHE = "daelan-offline-locals-v1";
 const CORE_ASSETS = [
   "./",
