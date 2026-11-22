@@ -1,4 +1,4 @@
-const CACHE_NAME = "v1.3.8.2.2 (sw.js fix)";
+const CACHE_NAME = "v1.3.8.2 (Hotfix)";
 const OFFLINE_CACHE = "daelan-offline-locals-v1";
 const CORE_ASSETS = [
   "./",
@@ -13,7 +13,6 @@ const CORE_ASSETS = [
   "./Daelan_0_web/assets/webview.png"
 ];
 
-// Install: cache core page assets
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -22,7 +21,6 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Activate: delete old outdated caches (while keeping OFFLINE_CACHE safe) and broadcast the new version
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -45,7 +43,6 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Message: handle version requests, "+ Add to Locals", and "Remove" from script.js
 self.addEventListener("message", (event) => {
   if (!event.data) return;
 
@@ -60,9 +57,9 @@ self.addEventListener("message", (event) => {
     caches.open(OFFLINE_CACHE).then(async (cache) => {
       for (const url of event.data.urls) {
         const directUrl = url.replace(
-  "https://github.com",
-  "https://githubusercontent.com"
-);
+          "https://github.com",
+          "https://githubusercontent.com"
+        );
         const response = await fetch(directUrl, { mode: "no-cors" });
         await cache.put(url, response);
       }
@@ -83,7 +80,6 @@ self.addEventListener("message", (event) => {
   }
 });
 
-// Fetch: serve saved Local files offline, otherwise network first with core fallback
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.open(OFFLINE_CACHE).then((offlineCache) => {
