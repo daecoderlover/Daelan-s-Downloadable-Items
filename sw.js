@@ -60,9 +60,9 @@ self.addEventListener("message", (event) => {
     caches.open(OFFLINE_CACHE).then(async (cache) => {
       for (const url of event.data.urls) {
         const directUrl = url.replace(
-          "https://github.com",
-          "https://githubusercontent.com"
-        );
+  "https://github.com",
+  "https://githubusercontent.com"
+);
         const response = await fetch(directUrl, { mode: "no-cors" });
         await cache.put(url, response);
       }
