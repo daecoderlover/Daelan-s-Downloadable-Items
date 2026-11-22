@@ -34,7 +34,7 @@ const items = [
         category: "Daelan's Archives",
         thumbnail: "assets/Win12_Launcher_Preview_Video.mp4",
         isVideoThumbnail: true,
-        fileSize: "28.26 MB",
+        fileSize: "14.13 MB",
         dateCreated: "2026-09-25",
         downloadLinks: [
             { url: "https://github.com/daecoderlover/Daelan-s-Downloadable-Items/raw/refs/heads/files_for_download/assets/Win12_Build.daex", name: "Win12_Build.daex" }
@@ -48,7 +48,7 @@ const items = [
         category: "Old Daelan's Archives",
         thumbnail: "assets/Win12_Launcher_Preview_Video.mp4",
         isVideoThumbnail: true,
-        fileSize: "28.26 MB",
+        fileSize: "14.13 MB",
         dateCreated: "2026-09-25",
         downloadLinks: [
             { url: "https://github.com/daecoderlover/Daelan-s-Downloadable-Items/raw/refs/heads/files_for_download/assets/Win12_Build.dae", name: "Win12_Build.dae" }
