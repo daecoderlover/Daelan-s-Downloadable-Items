@@ -134,7 +134,7 @@
         }
       }, 180);
 
-      setTimeout(() => {
+            setTimeout(async () => {
         clearInterval(timer);
         fill.style.width = "100%";
         percentText.textContent = "100%";
@@ -144,6 +144,44 @@
           statusText.textContent = "Download link coming soon.";
           return;
         }
+
+        // Check if file is cached in Local Offline Storage first
+        try {
+          const cache = await caches.open("daelan-offline-locals-v1");
+          const cachedResponse = await cache.match(safeLinks[0].url, { ignoreSearch: true });
+          if (cachedResponse && (!navigator.onLine || getSavedLocals().includes(selectedItem.id))) {
+            statusText.textContent = "Saving from Local Offline Cache...";
+            const blob = await cachedResponse.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = blobUrl;
+            a.download = safeLinks[0].name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+            statusText.textContent = "Saved offline (" + safeLinks[0].name + ")!";
+            return;
+          }
+        } catch (e) {
+          console.warn("Offline cache check skipped:", e);
+        }
+
+        // Online Server behavior (unchanged)
+        statusText.textContent = `Starting download (${safeLinks.length} file)...`;
+        if (/Android/i.test(navigator.userAgent)) {
+          window.location.href = safeLinks[0].url;
+        } else {
+          safeLinks.forEach(link => {
+            const a = document.createElement("a");
+            a.href = link.url;
+            a.download = link.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          });
+        }
+      }, 1400);
 
         statusText.textContent = `Starting download (${safeLinks.length} file)...`;
         if (/Android/i.test(navigator.userAgent)) {
