@@ -28,3 +28,16 @@ setTimeout(() => {
         setTimeout(() => el.style.display = 'none', 300);
     });
 }, 2500);
+
+// Dismiss Cordova native SplashScreen immediately when page loads
+document.addEventListener("deviceready", () => {
+    if (navigator.splashscreen && navigator.splashscreen.hide) {
+        navigator.splashscreen.hide();
+    }
+}, false);
+
+setTimeout(() => {
+    if (navigator.splashscreen && navigator.splashscreen.hide) {
+        navigator.splashscreen.hide();
+    }
+}, 2000);
