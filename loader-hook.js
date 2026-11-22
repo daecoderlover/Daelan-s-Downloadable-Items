@@ -19,3 +19,12 @@ window.handleDownload = function(itemId) {
 
     window.location.href = `download.html?id=${item.id}`;
 };
+
+// Failsafe: never allow Cordova splash loader to stay stuck past 2.5s
+setTimeout(() => {
+    document.querySelectorAll('#app-loader, .loader-overlay, [id*="loader"]').forEach(el => {
+        el.style.opacity = '0';
+        el.style.pointerEvents = 'none';
+        setTimeout(() => el.style.display = 'none', 300);
+    });
+}, 2500);
