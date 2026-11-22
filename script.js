@@ -159,7 +159,12 @@ function createItemCard(item) {
 
     return '<div class="item-card ' + (item.featured ? 'featured' : '') + '" data-id="' + item.id + '">' +
         '<div class="card-thumbnail">' + thumbHTML + playHTML +
-            '<button class="card-menu">⋯</button>' +
+                        '<button class="card-menu" onclick="toggleCardMenu(event, ' + item.id + ')" style="z-index:6; cursor:pointer;">⋯</button>' +
+            '<div id="card-menu-' + item.id + '" class="card-dropdown-menu" onclick="event.stopPropagation()" style="display:none; position:absolute; top:44px; right:10px; background:#0F172A; border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:6px; min-width:165px; z-index:20; box-shadow:0 8px 24px rgba(0,0,0,0.6);">' +
+                '<button onclick="copyItemLink(' + item.id + ', this)" style="display:block; width:100%; text-align:left; background:none; border:none; color:#E2E8F0; padding:8px 10px; font-size:13px; border-radius:6px; cursor:pointer;">🔗 Copy Download Link</button>' +
+                '<button onclick="showItemDetails(' + item.id + ')" style="display:block; width:100%; text-align:left; background:none; border:none; color:#E2E8F0; padding:8px 10px; font-size:13px; border-radius:6px; cursor:pointer;">ℹ️ File Details</button>' +
+                '<button onclick="handleDownload(' + item.id + ')" style="display:block; width:100%; text-align:left; background:none; border:none; color:#38BDF8; padding:8px 10px; font-size:13px; border-radius:6px; cursor:pointer;">⬇ Download File</button>' +
+            '</div>' +
             '<span class="card-size-badge">' + item.fileSize + '</span>' +
         '</div>' +
         '<div class="card-content">' +
@@ -490,3 +495,48 @@ function toggleCategorySubmenu(event, groupKey) {
     };
     applyFiltersAndRender();
 })();
+
+function toggleCardMenu(event, itemId) {
+    event.stopPropagation();
+    const target = document.getElementById('card-menu-' + itemId);
+    if (!target) return;
+
+    const isOpening = target.style.display === 'none';
+    document.querySelectorAll('.card-dropdown-menu').forEach(el => el.style.display = 'none');
+    if (isOpening) target.style.display = 'block';
+}
+
+document.addEventListener('click', () => {
+    document.querySelectorAll('.card-dropdown-menu').forEach(el => el.style.display = 'none');
+});
+
+function copyItemLink(itemId, btnEl) {
+    const item = items.find(i => i.id === itemId);
+    if (!item || !item.downloadLinks.length) return;
+
+    const url = item.downloadLinks[0].url;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(url);
+    }
+    const origText = btnEl.innerText;
+    btnEl.innerText = '✓ Link Copied!';
+    setTimeout(() => {
+        btnEl.innerText = origText;
+        document.querySelectorAll('.card-dropdown-menu').forEach(el => el.style.display = 'none');
+    }, 900);
+}
+
+function showItemDetails(itemId) {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+    document.querySelectorAll('.card-dropdown-menu').forEach(el => el.style.display = 'none');
+
+    const files = item.downloadLinks.map(l => l.name).join(', ');
+    alert(
+        '📦 ' + item.title + '\n' +
+        '📁 Category: ' + item.category + '\n' +
+        '📄 File: ' + files + '\n' +
+        '💾 Size: ' + item.fileSize + '\n' +
+        '📅 Created: ' + item.dateCreated
+    );
+}
