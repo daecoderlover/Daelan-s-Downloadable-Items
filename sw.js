@@ -57,8 +57,15 @@ self.addEventListener("message", (event) => {
   }
 
   if (event.data.type === "SAVE_LOCAL_ITEM") {
-    caches.open(OFFLINE_CACHE).then((cache) => {
-      return cache.addAll(event.data.urls);
+    caches.open(OFFLINE_CACHE).then(async (cache) => {
+      for (const url of event.data.urls) {
+        const directUrl = url.replace(
+          "https://github.com",
+          "https://githubusercontent.com"
+        );
+        const response = await fetch(directUrl, { mode: "no-cors" });
+        await cache.put(url, response);
+      }
     }).then(() => {
       event.source.postMessage({
         type: "LOCAL_ITEM_SAVED",
@@ -80,7 +87,7 @@ self.addEventListener("message", (event) => {
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.open(OFFLINE_CACHE).then((offlineCache) => {
-      return offlineCache.match(event.request).then((cachedLocalFile) => {
+      return offlineCache.match(event.request, { ignoreSearch: true }).then((cachedLocalFile) => {
         if (cachedLocalFile) {
           return cachedLocalFile;
         }
