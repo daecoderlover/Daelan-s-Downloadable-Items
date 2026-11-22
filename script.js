@@ -226,15 +226,22 @@ function addToLocals(itemId, btnElement) {
         .filter(link => isFileSafe(link.name))
         .map(link => link.url);
 
-    if (item.thumbnail) {
+    if (item.thumbnail && !item.isVideoThumbnail) {
         urlsToCache.push(item.thumbnail);
     }
 
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-            type: "SAVE_LOCAL_ITEM",
-            id: item.id,
-            urls: urlsToCache
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.ready.then((registration) => {
+            const worker = navigator.serviceWorker.controller || registration.active;
+            if (worker) {
+                worker.postMessage({
+                    type: "SAVE_LOCAL_ITEM",
+                    id: item.id,
+                    urls: urlsToCache
+                });
+            } else {
+                markItemAsLocal(item.id);
+            }
         });
     } else {
         markItemAsLocal(item.id);
