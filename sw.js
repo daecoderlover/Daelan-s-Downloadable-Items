@@ -53,15 +53,21 @@ self.addEventListener("message", (event) => {
     });
   }
 
-  if (event.data.type === "SAVE_LOCAL_ITEM") {
+    if (event.data.type === "SAVE_LOCAL_ITEM") {
     caches.open(OFFLINE_CACHE).then(async (cache) => {
       for (const url of event.data.urls) {
         const directUrl = url.replace(
           "https://github.com",
           "https://githubusercontent.com"
         );
-        const response = await fetch(directUrl, { mode: "no-cors" });
-        await cache.put(url, response);
+        try {
+          const response = await fetch(directUrl);
+          if (response.ok) {
+            await cache.put(url, response);
+          }
+        } catch (e) {
+          console.warn("Skipped uncached asset:", directUrl);
+        }
       }
     }).then(() => {
       event.source.postMessage({
@@ -70,8 +76,12 @@ self.addEventListener("message", (event) => {
       });
     }).catch((err) => {
       console.error("Failed to cache item locally:", err);
+      event.source.postMessage({
+        type: "LOCAL_ITEM_FAILED",
+        id: event.data.id
+      });
     });
-  }
+    }
 
   if (event.data.type === "REMOVE_LOCAL_ITEM") {
     caches.open(OFFLINE_CACHE).then((cache) => {
