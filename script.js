@@ -8,8 +8,8 @@ const TEXT_CATEGORIES = ["Text", "Plain Text (.txt)", "Markdown (.md)", "Logs & 
 const PROGRAMS_CATEGORIES = ["Programs", "Android Apps", "Windows Tools", "Portable Utilities"];
 const ARCHIVE_CATEGORIES = [
     "Archives",
-    "Daelan's Archive",
-    "Old Daelan's Archive",
+    "Daelan's Archives",
+    "Old Daelan's Archives",
     "Zip Archives",
     "Rar Archives",
     "7z Archives",
