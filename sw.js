@@ -1,4 +1,4 @@
-const CACHE_NAME = "v1.3.8.2 (sw.js fix)";
+const CACHE_NAME = "v1.3.8.2.1 (sw.js fix)";
 const OFFLINE_CACHE = "daelan-offline-locals-v1";
 const CORE_ASSETS = [
   "./",
@@ -17,7 +17,7 @@ const CORE_ASSETS = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(CORE_ASSETS))
+      .then(cache => Promise.allSettled(CORE_ASSETS.map(url => cache.add(url))))
       .then(() => self.skipWaiting())
   );
 });
