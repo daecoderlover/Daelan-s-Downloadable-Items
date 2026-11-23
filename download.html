@@ -98,7 +98,7 @@
 
   <script src="script.js"></script>
 
-      <script>
+        <script>
     const platformImg = document.getElementById("platformImg");
     if (navigator.userAgent.includes("Windows")) {
       platformImg.src = "Daelan_0_web/assets/webview.png";
@@ -134,7 +134,7 @@
         }
       }, 180);
 
-            setTimeout(async () => {
+      setTimeout(async () => {
         clearInterval(timer);
         fill.style.width = "100%";
         percentText.textContent = "100%";
@@ -182,22 +182,7 @@
           });
         }
       }, 1400);
-
-        statusText.textContent = `Starting download (${safeLinks.length} file)...`;
-        if (/Android/i.test(navigator.userAgent)) {
-          window.location.href = safeLinks[0].url;
-        } else {
-          safeLinks.forEach(link => {
-            const a = document.createElement("a");
-            a.href = link.url;
-            a.download = link.name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          });
-        }
-      }, 1400);
     }
-      </script>
+        </script>
 </body>
 </html>
