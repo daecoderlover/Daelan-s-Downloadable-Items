@@ -156,14 +156,22 @@ function createItemCard(item) {
         : '';
     const countText = safeLinks.length > 1 ? '(' + safeLinks.length + ' files)' : '';
     const unsafeHTML = unsafeLinks.length > 0 ? '<p style="color:#f87171;font-size:11px;margin-top:8px;">⚠️ ' + unsafeLinks.length + ' file blocked for safety</p>' : '';
-
     return '<div class="item-card ' + (item.featured ? 'featured' : '') + '" data-id="' + item.id + '">' +
         '<div class="card-thumbnail">' + thumbHTML + playHTML +
-                        '<button class="card-menu" onclick="toggleCardMenu(event, ' + item.id + ')" style="z-index:6; cursor:pointer;">⋯</button>' +
-            '<div id="card-menu-' + item.id + '" class="card-dropdown-menu" onclick="event.stopPropagation()" style="display:none; position:absolute; top:44px; right:10px; background:#0F172A; border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:6px; min-width:165px; z-index:20; box-shadow:0 8px 24px rgba(0,0,0,0.6);">' +
-                '<button onclick="copyItemLink(' + item.id + ', this)" style="display:block; width:100%; text-align:left; background:none; border:none; color:#E2E8F0; padding:8px 10px; font-size:13px; border-radius:6px; cursor:pointer;">🔗 Copy Download Link</button>' +
-                '<button onclick="showItemDetails(' + item.id + ')" style="display:block; width:100%; text-align:left; background:none; border:none; color:#E2E8F0; padding:8px 10px; font-size:13px; border-radius:6px; cursor:pointer;">ℹ️ File Details</button>' +
-                '<button onclick="handleDownload(' + item.id + ')" style="display:block; width:100%; text-align:left; background:none; border:none; color:#38BDF8; padding:8px 10px; font-size:13px; border-radius:6px; cursor:pointer;">⬇ Download File</button>' +
+            '<button class="card-menu" onclick="toggleCardMenu(event, ' + item.id + ')" style="z-index:6; cursor:pointer;">⋯</button>' +
+            '<div id="card-menu-' + item.id + '" class="card-dropdown-menu" onclick="event.stopPropagation()" style="display:none; position:absolute; top:44px; right:10px; background:#0F172A; border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:6px; min-width:175px; z-index:20; box-shadow:0 8px 24px rgba(0,0,0,0.6);">' +
+                '<button onclick="copyItemLink(' + item.id + ', this)" style="display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:none; border:none; color:#E2E8F0; padding:8px 10px; font-size:13px; border-radius:6px; cursor:pointer;">' +
+                    '<svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:15px; height:15px; flex-shrink:0;"><path fill-rule="evenodd" d="M19.902 4.098a3.75 3.75 0 0 0-5.304 0l-4.5 4.5a3.75 3.75 0 0 0 1.035 6.037.75.75 0 0 1-.646 1.353 5.25 5.25 0 0 1-1.449-8.45l4.5-4.5a5.25 5.25 0 1 1 7.424 7.424l-1.757 1.757a.75.75 0 1 1-1.06-1.06l1.757-1.757a3.75 3.75 0 0 0 0-5.304Zm-7.389 4.267a.75.75 0 0 1 1-.353 5.25 5.25 0 0 1 1.449 8.45l-4.5 4.5a5.25 5.25 0 1 1-7.424-7.424l1.757-1.757a.75.75 0 1 1 1.06 1.06l-1.757 1.757a3.75 3.75 0 1 0 5.304 5.304l4.5-4.5a3.75 3.75 0 0 0-1.035-6.037.75.75 0 0 1-.354-1Z" clip-rule="evenodd" /></svg>' +
+                    '<span>Copy Download Link</span>' +
+                '</button>' +
+                '<button onclick="showItemDetails(' + item.id + ')" style="display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:none; border:none; color:#E2E8F0; padding:8px 10px; font-size:13px; border-radius:6px; cursor:pointer;">' +
+                    '<svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:15px; height:15px; flex-shrink:0;"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" /></svg>' +
+                    '<span>File Details</span>' +
+                '</button>' +
+                '<button onclick="handleDownload(' + item.id + ')" style="display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:none; border:none; color:#38BDF8; padding:8px 10px; font-size:13px; border-radius:6px; cursor:pointer;">' +
+                    '<svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:15px; height:15px; flex-shrink:0;"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" /></svg>' +
+                    '<span>Download File</span>' +
+                '</button>' +
             '</div>' +
             '<span class="card-size-badge">' + item.fileSize + '</span>' +
         '</div>' +
@@ -174,10 +182,10 @@ function createItemCard(item) {
                 '<p class="card-desc">' + item.description + '</p>' +
             '</div>' +
             '<div>' +
-                '<div class="card-meta"><span>📅 ' + item.dateCreated + '</span></div>' +
+                '<div class="card-meta"><span style="display:inline-flex; align-items:center; gap:5px;"><svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:14px; height:14px;"><path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd" /></svg>' + item.dateCreated + '</span></div>' +
                 '<div class="card-actions">' +
                     addLocalBtn +
-                    '<button class="download-btn" onclick="handleDownload(' + item.id + ')">⬇ Download ' + countText + '</button>' +
+                    '<button class="download-btn" onclick="handleDownload(' + item.id + ')" style="display:inline-flex; align-items:center; justify-content:center; gap:6px;"><svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:15px; height:15px;"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" /></svg><span>Download ' + countText + '</span></button>' +
                 '</div>' +
                 unsafeHTML +
             '</div>' +
@@ -185,8 +193,7 @@ function createItemCard(item) {
     '</div>';
 }
 
-
-function applyFiltersAndRender() {
+    function applyFiltersAndRender() {
     const grid = document.getElementById('items-grid');
     if (!grid) return;
     const savedLocals = getSavedLocals();
@@ -525,10 +532,11 @@ function copyItemLink(itemId, btnEl) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(url);
     }
-    const origText = btnEl.innerText;
-    btnEl.innerText = '✓ Link Copied!';
+    const labelSpan = btnEl.querySelector('span') || btnEl;
+    const origText = labelSpan.innerText;
+    labelSpan.innerText = 'Link Copied!';
     setTimeout(() => {
-        btnEl.innerText = origText;
+        labelSpan.innerText = origText;
         document.querySelectorAll('.card-dropdown-menu').forEach(el => el.style.display = 'none');
     }, 900);
 }
@@ -540,10 +548,11 @@ function showItemDetails(itemId) {
 
     const files = item.downloadLinks.map(l => l.name).join(', ');
     alert(
-        '📦 ' + item.title + '\n' +
-        '📁 Category: ' + item.category + '\n' +
-        '📄 File: ' + files + '\n' +
-        '💾 Size: ' + item.fileSize + '\n' +
-        '📅 Created: ' + item.dateCreated
+        item.title + '\n' +
+        '━━━━━━━━━━━━━━━━━━━━\n' +
+        '▸ Category: ' + item.category + '\n' +
+        '▸ File: ' + files + '\n' +
+        '▸ Size: ' + item.fileSize + '\n' +
+        '▸ Created: ' + item.dateCreated
     );
 }
