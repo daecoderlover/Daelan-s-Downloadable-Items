@@ -165,7 +165,7 @@
             <button onclick="resetFilters()">Clear Filter ✕</button>
         </div>
                 <!-- Main Install Trigger Button -->
-        <button id="install-app-btn" type="button" onclick="openInstallPicker()" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; padding:12px 22px; font-size:15px; font-weight:600; color:#FFFFFF; background:#2563EB; border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.4);">
+        <button id="custom-install-picker-btn" type="button" onclick="openInstallPicker()" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; padding:12px 22px; font-size:15px; font-weight:600; color:#FFFFFF; background:#2563EB; border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.4);">
           <span>Install Daelan's Downloadable Items</span>
         </button>
 
@@ -274,7 +274,7 @@
 
             if (isCordovaOrWebView || isStandalonePWA) {
         refreshBtn.style.display = 'inline-flex';
-        const installBtn = document.getElementById('install-app-btn');
+        const installBtn = document.getElementById('custom-install-picker-btn');
         if (installBtn) installBtn.style.display = 'none';
             }
 
@@ -353,7 +353,7 @@
     <!-- Floating Debug Info Panel -->
     <div id="debug-panel">
         [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
-        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.3.9.6</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.3.9.7</span><br>
         [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
     </div>
 
