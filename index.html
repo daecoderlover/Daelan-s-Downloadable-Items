@@ -169,7 +169,7 @@
           <span>Install Daelan's Downloadable Items</span>
         </button>
 
-        <!-- Install Platform Picker Modal -->
+                <!-- Install Platform Picker Modal -->
         <div id="install-picker-modal" onclick="this.style.display='none'" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.82); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
           <div onclick="event.stopPropagation()" style="background:#0F172A; border:1px solid rgba(255,255,255,0.14); border-radius:16px; width:100%; max-width:380px; padding:20px; text-align:left; box-shadow:0 20px 40px rgba(0,0,0,0.65);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -179,36 +179,66 @@
 
             <div style="display:flex; flex-direction:column; gap:10px;">
               <!-- 1. Chrome / Edge PWA -->
-              <button id="opt-pwa-install" type="button" onclick="triggerPWAInstall()" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(56,189,248,0.4); border-radius:10px; color:#F8FAFC; cursor:pointer; text-align:left;">
-                <div>
-                  <div style="font-weight:600; font-size:14px;">🌐 Chrome / Edge Web App (PWA)</div>
-                  <div id="pwa-subtext" style="font-size:11px; color:#94A3B8; margin-top:2px;">Instant install • No Windows Defender warning</div>
+              <button id="opt-pwa-install" type="button" onclick="triggerPWAInstall()" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(56,189,248,0.4); border-radius:10px; color:#F8FAFC; cursor:pointer; text-align:left; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="display:inline-flex; width:20px; height:20px; color:#38BDF8; flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                      <path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z" />
+                    </svg>
+                  </span>
+                  <div>
+                    <div style="font-weight:600; font-size:14px;">Chrome / Edge Web App (PWA)</div>
+                    <div id="pwa-subtext" style="font-size:11px; color:#94A3B8; margin-top:2px;">Instant install • No Windows Defender warning</div>
+                  </div>
                 </div>
-                <span style="font-size:11px; font-weight:700; color:#38BDF8;">RECOMMENDED</span>
+                <span style="font-size:10px; font-weight:700; color:#38BDF8; flex-shrink:0;">RECOMMENDED</span>
               </button>
 
-              <!-- 2. GitHub Android APK -->
-              <a href="https://github.com/daecoderlover/Daelan-s-Downloadable-Items/blob/main/DaelansDownloads.apk" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
-                <div>
-                  <div style="font-weight:600; font-size:14px;">🤖 GitHub Android APK</div>
-                  <div style="font-size:11px; color:#94A3B8; margin-top:2px;">Native Cordova Android package (.apk)</div>
+              <!-- 2. Android APK (Direct ://githubusercontent.com) -->
+              <a href="https://://githubusercontent.com/daecoderlover/Daelan-s-Downloadable-Items/main/DaelansDownloads.apk" download="DaelansDownloads.apk" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="display:inline-flex; width:20px; height:20px; color:#34D399; flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                      <path d="M10.5 18.75a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z" />
+                      <path fill-rule="evenodd" d="M8.625.75A3.375 3.375 0 0 0 5.25 4.125v15.75a3.375 3.375 0 0 0 3.375 3.375h6.75a3.375 3.375 0 0 0 3.375-3.375V4.125A3.375 3.375 0 0 0 15.375.75h-6.75ZM7.5 4.125C7.5 3.504 8.004 3 8.625 3H9.75v.375c0 .621.504 1.125 1.125 1.125h2.25c.621 0 1.125-.504 1.125-1.125V3h1.125c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125h-6.75A1.125 1.125 0 0 1 7.5 19.875V4.125Z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                  <div>
+                    <div style="font-weight:600; font-size:14px;">Android APK</div>
+                    <div style="font-size:11px; color:#94A3B8; margin-top:2px;">Native Cordova Android package (.apk)</div>
+                  </div>
                 </div>
-                <span style="font-size:12px; color:#38BDF8;">↗</span>
+                <span style="display:inline-flex; width:16px; height:16px; color:#38BDF8;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                    <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                  </svg>
+                </span>
               </a>
 
-              <!-- 3. GitHub Windows EXE -->
-              <a href="https://github.com/daecoderlover/Daelan-s-Downloadable-Items/blob/main/DaelansDownloads.exe" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
-                <div>
-                  <div style="font-weight:600; font-size:14px;">🪟 GitHub Windows EXE</div>
-                  <div style="font-size:11px; color:#94A3B8; margin-top:2px;">Windows desktop executable (.exe)</div>
+              <!-- 3. Computer EXE (Direct ://githubusercontent.com) -->
+              <a href="https://://githubusercontent.com/daecoderlover/Daelan-s-Downloadable-Items/main/DaelansDownloads.exe" download="DaelansDownloads.exe" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="display:inline-flex; width:20px; height:20px; color:#60A5FA; flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                      <path fill-rule="evenodd" d="M2.25 5.25a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3V15a3 3 0 0 1-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 0 1-.53 1.28h-9a.75.75 0 0 1-.53-1.28l.621-.622a2.25 2.25 0 0 0 .659-1.59V18h-3a3 3 0 0 1-3-3V5.25Zm1.5 0v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5Z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                  <div>
+                    <div style="font-weight:600; font-size:14px;">Computer EXE</div>
+                    <div style="font-size:11px; color:#94A3B8; margin-top:2px;">Desktop executable (.exe)</div>
+                  </div>
                 </div>
-                <span style="font-size:12px; color:#38BDF8;">↗</span>
+                <span style="display:inline-flex; width:16px; height:16px; color:#38BDF8;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                    <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                  </svg>
+                </span>
               </a>
 
               <!-- 4. Future Windows MSI -->
               <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:rgba(30,41,59,0.45); border:1px dashed rgba(255,255,255,0.12); border-radius:10px; color:#64748B;">
                 <div>
-                  <div style="font-weight:600; font-size:14px;">📦 Windows Installer (MSI)</div>
+                  <div style="font-weight:600; font-size:14px;">Windows Installer (MSI)</div>
                   <div style="font-size:11px; margin-top:2px;">Enterprise Windows package (.msi)</div>
                 </div>
                 <span style="font-size:10px; font-weight:700; padding:3px 7px; border-radius:6px; background:rgba(148,163,184,0.15); color:#94A3B8;">FUTURE</span>
@@ -217,7 +247,7 @@
               <!-- 5. Future webOS IPK -->
               <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:rgba(30,41,59,0.45); border:1px dashed rgba(255,255,255,0.12); border-radius:10px; color:#64748B;">
                 <div>
-                  <div style="font-weight:600; font-size:14px;">📺 webOS App Package (IPK)</div>
+                  <div style="font-weight:600; font-size:14px;">webOS App Package (IPK)</div>
                   <div style="font-size:11px; margin-top:2px;">Smart TV / webOS package (.ipk)</div>
                 </div>
                 <span style="font-size:10px; font-weight:700; padding:3px 7px; border-radius:6px; background:rgba(148,163,184,0.15); color:#94A3B8;">FUTURE</span>
