@@ -1,4 +1,4 @@
-const CACHE_NAME = "v1.3.9.4";
+const CACHE_NAME = "v1.3.9.5";
 const OFFLINE_CACHE = "daelan-offline-locals-v1";
 const CORE_ASSETS = [
   "./",
