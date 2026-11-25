@@ -353,7 +353,7 @@
     <!-- Floating Debug Info Panel -->
     <div id="debug-panel">
         [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
-        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.3.9.8</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.3.9.9</span><br>
         [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
     </div>
 
@@ -376,35 +376,26 @@ installButton.addEventListener('click', async () => {
 });
 </script>
 <script>
-  let deferredInstallPrompt = null;
+  window.deferredInstallPrompt = window.deferredInstallPrompt || null;
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    deferredInstallPrompt = e;
+    window.deferredInstallPrompt = e;
     const sub = document.getElementById('pwa-subtext');
     if (sub) sub.textContent = 'Ready for 1-tap instant install!';
   });
 
-  function openInstallPicker() {
-    const modal = document.getElementById('install-picker-modal');
-    if (modal) modal.style.display = 'flex';
-  }
-
-  function closeInstallPicker() {
-    const modal = document.getElementById('install-picker-modal');
-    if (modal) modal.style.display = 'none';
-  }
-
   async function triggerPWAInstall() {
-    if (deferredInstallPrompt) {
-      deferredInstallPrompt.prompt();
-      const { outcome } = await deferredInstallPrompt.userChoice;
+    const promptEvent = window.deferredInstallPrompt || (typeof deferredPrompt !== 'undefined' ? deferredPrompt : null);
+    if (promptEvent) {
+      promptEvent.prompt();
+      const { outcome } = await promptEvent.userChoice;
       if (outcome === 'accepted') {
-        deferredInstallPrompt = null;
-        closeInstallPicker();
+        window.deferredInstallPrompt = null;
+        document.getElementById('install-picker-modal').style.display = 'none';
       }
     } else {
-      alert('To install the Web App (PWA):\n• Chrome / Edge Desktop: Click the Install icon in the address bar.\n• Android Chrome: Tap ⋮ Menu -> "Add to Home screen" / "Install app".');
+      alert('To install the Web App (PWA):\n• Android Chrome: Tap ⋮ Menu (top right) -> "Add to Home screen" / "Install app".\n• Windows Chrome / Edge: Click the Install icon in the address bar.');
     }
   }
 </script>
