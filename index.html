@@ -164,17 +164,17 @@
             <span id="filter-label">Showing: All</span>
             <button onclick="resetFilters()">Clear Filter ✕</button>
         </div>
-                <!-- Main Install Trigger Button -->
-        <button id="custom-install-picker-btn" type="button" onclick="openInstallPicker()" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; padding:12px 22px; font-size:15px; font-weight:600; color:#FFFFFF; background:#2563EB; border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.4);">
+                        <!-- Main Install Trigger Button -->
+        <button id="custom-install-picker-btn" type="button" onclick="document.getElementById('install-picker-modal').style.display='flex'" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; padding:12px 22px; font-size:15px; font-weight:600; color:#FFFFFF; background:#2563EB; border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.4);">
           <span>Install Daelan's Downloadable Items</span>
         </button>
 
         <!-- Install Platform Picker Modal -->
-        <div id="install-picker-modal" onclick="closeInstallPicker()" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.82); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+        <div id="install-picker-modal" onclick="this.style.display='none'" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.82); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
           <div onclick="event.stopPropagation()" style="background:#0F172A; border:1px solid rgba(255,255,255,0.14); border-radius:16px; width:100%; max-width:380px; padding:20px; text-align:left; box-shadow:0 20px 40px rgba(0,0,0,0.65);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
               <h3 style="margin:0; font-size:17px; color:#F8FAFC;">Choose Install Version</h3>
-              <button type="button" onclick="closeInstallPicker()" style="background:none; border:none; color:#94A3B8; font-size:18px; cursor:pointer;">✕</button>
+              <button type="button" onclick="document.getElementById('install-picker-modal').style.display='none'" style="background:none; border:none; color:#94A3B8; font-size:18px; cursor:pointer;">✕</button>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:10px;">
@@ -188,7 +188,7 @@
               </button>
 
               <!-- 2. GitHub Android APK -->
-              <a href="https://github.com/daecoderlover/Daelan-s-Downloadable-Items/" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
+              <a href="https://github.com/daecoderlover/Daelan-s-Downloadable-Items/blob/main/DaelansDownloads.apk" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
                 <div>
                   <div style="font-weight:600; font-size:14px;">🤖 GitHub Android APK</div>
                   <div style="font-size:11px; color:#94A3B8; margin-top:2px;">Native Cordova Android package (.apk)</div>
@@ -197,7 +197,7 @@
               </a>
 
               <!-- 3. GitHub Windows EXE -->
-              <a href="https://github.com" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
+              <a href="https://github.com/daecoderlover/Daelan-s-Downloadable-Items/blob/main/DaelansDownloads.exe" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
                 <div>
                   <div style="font-weight:600; font-size:14px;">🪟 GitHub Windows EXE</div>
                   <div style="font-size:11px; color:#94A3B8; margin-top:2px;">Windows desktop executable (.exe)</div>
@@ -353,7 +353,7 @@
     <!-- Floating Debug Info Panel -->
     <div id="debug-panel">
         [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
-        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.3.9.7</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.3.9.8</span><br>
         [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
     </div>
 
