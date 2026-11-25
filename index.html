@@ -272,9 +272,11 @@
         window.matchMedia('(display-mode: standalone)').matches ||
         window.navigator.standalone === true;
 
-      if (isCordovaOrWebView || isStandalonePWA) {
+            if (isCordovaOrWebView || isStandalonePWA) {
         refreshBtn.style.display = 'inline-flex';
-      }
+        const installBtn = document.getElementById('install-app-btn');
+        if (installBtn) installBtn.style.display = 'none';
+            }
 
       window.addEventListener('beforeinstallprompt', () => {
         if (!isCordovaOrWebView && !isStandalonePWA) {
@@ -351,7 +353,7 @@
     <!-- Floating Debug Info Panel -->
     <div id="debug-panel">
         [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
-        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.3.9.4</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.3.9.6</span><br>
         [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
     </div>
 
