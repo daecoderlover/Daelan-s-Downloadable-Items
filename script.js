@@ -487,7 +487,7 @@ function toggleCategorySubmenu(event, groupKey) {
 
         CATEGORY_GROUPS[group].forEach((sub, idx) => {
             const label = idx === 0 ? 'All ' + group : sub;
-            html += '<button onclick="filterByFileType(\'' + sub.replace(/'/g, "\\'") + '\')">' + label + '</button>';
+            html += '<button onclick="filterByFileType(\'' + sub.replace(/\\/g, "\\\\").replace(/'/g, "\\'") + '\')">' + label + '</button>';
         });
         html += '</div></div>';
     });
