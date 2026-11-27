@@ -546,13 +546,60 @@ function showItemDetails(itemId) {
     if (!item) return;
     document.querySelectorAll('.card-dropdown-menu').forEach(el => el.style.display = 'none');
 
+    let modal = document.getElementById('file-details-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'file-details-modal';
+        modal.onclick = function() { modal.style.display = 'none'; };
+        modal.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(2,6,23,0.82); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center; padding:16px;';
+        modal.innerHTML =
+            '<div onclick="event.stopPropagation()" style="background:#0F172A; border:1px solid rgba(255,255,255,0.14); border-radius:16px; width:100%; max-width:380px; padding:20px; text-align:left; box-shadow:0 20px 40px rgba(0,0,0,0.65);">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">' +
+                '<div style="display:flex; align-items:center; gap:8px;">' +
+                  '<span style="display:inline-flex; width:18px; height:18px; color:#38BDF8; flex-shrink:0;">' +
+                    '<svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" /></svg>' +
+                  '</span>' +
+                  '<h3 id="fd-title" style="margin:0; font-size:16px; color:#F8FAFC;">File Details</h3>' +
+                '</div>' +
+                '<button type="button" onclick="document.getElementById(\'file-details-modal\').style.display=\'none\'" style="background:none; border:none; color:#94A3B8; font-size:18px; cursor:pointer;">✕</button>' +
+              '</div>' +
+              '<div style="display:flex; flex-direction:column; gap:10px; font-size:13px; color:#CBD5E1;">' +
+                '<div style="display:flex; align-items:center; gap:10px; background:#1E293B; padding:10px 12px; border-radius:10px;">' +
+                  '<span style="display:inline-flex; width:17px; height:17px; color:#A78BFA; flex-shrink:0;"><svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;"><path d="M19.5 21a3 3 0 0 0 3-3v-4.5a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3V18a3 3 0 0 0 3 3h15ZM1.5 10.146V6a3 3 0 0 1 3-3h5.379a2.25 2.25 0 0 1 1.59.659l2.122 2.121c.14.141.331.22.53.22H19.5a3 3 0 0 1 3 3v1.146A4.483 4.483 0 0 0 19.5 9h-15a4.483 4.483 0 0 0-3 1.146Z" /></svg></span>' +
+                  '<div><span style="color:#94A3B8; font-size:11px; display:block;">Category</span><strong id="fd-category" style="color:#F8FAFC;"></strong></div>' +
+                '</div>' +
+                '<div style="display:flex; align-items:center; gap:10px; background:#1E293B; padding:10px 12px; border-radius:10px;">' +
+                  '<span style="display:inline-flex; width:17px; height:17px; color:#38BDF8; flex-shrink:0;"><svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;"><path fill-rule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625ZM7.5 15a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 7.5 15Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H8.25Z" clip-rule="evenodd" /><path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" /></svg></span>' +
+                  '<div style="word-break:break-all;"><span style="color:#94A3B8; font-size:11px; display:block;">File</span><strong id="fd-files" style="color:#F8FAFC;"></strong></div>' +
+                '</div>' +
+                '<div style="display:flex; align-items:center; gap:10px; background:#1E293B; padding:10px 12px; border-radius:10px;">' +
+                  '<span style="display:inline-flex; width:17px; height:17px; color:#34D399; flex-shrink:0;"><svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;"><path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375Z" /><path fill-rule="evenodd" d="m3.087 9 .54 9.176A3 3 0 0 0 6.62 21h10.757a3 3 0 0 0 2.995-2.824L20.913 9H3.087Zm6.163 3.75A.75.75 0 0 1 10 12h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" /></svg></span>' +
+                  '<div><span style="color:#94A3B8; font-size:11px; display:block;">Size</span><strong id="fd-size" style="color:#F8FAFC;"></strong></div>' +
+                '</div>' +
+                '<div style="display:flex; align-items:center; gap:10px; background:#1E293B; padding:10px 12px; border-radius:10px;">' +
+                  '<span style="display:inline-flex; width:17px; height:17px; color:#FBBF24; flex-shrink:0;"><svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;"><path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd" /></svg></span>' +
+                  '<div><span style="color:#94A3B8; font-size:11px; display:block;">Created</span><strong id="fd-date" style="color:#F8FAFC;"></strong></div>' +
+                '</div>' +
+              '</div>' +
+              '<button id="fd-download-btn" type="button" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:16px; padding:11px 16px; font-size:14px; font-weight:600; color:#FFFFFF; background:#2563EB; border:none; border-radius:10px; cursor:pointer;">' +
+                '<svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px;"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" /></svg>' +
+                '<span>Download Now</span>' +
+              '</button>' +
+            '</div>';
+        document.body.appendChild(modal);
+    }
+
     const files = item.downloadLinks.map(l => l.name).join(', ');
-    alert(
-        item.title + '\n' +
-        '━━━━━━━━━━━━━━━━━━━━\n' +
-        '▸ Category: ' + item.category + '\n' +
-        '▸ File: ' + files + '\n' +
-        '▸ Size: ' + item.fileSize + '\n' +
-        '▸ Created: ' + item.dateCreated
-    );
+    document.getElementById('fd-title').textContent = item.title;
+    document.getElementById('fd-category').textContent = item.category;
+    document.getElementById('fd-files').textContent = files;
+    document.getElementById('fd-size').textContent = item.fileSize;
+    document.getElementById('fd-date').textContent = item.dateCreated;
+
+    document.getElementById('fd-download-btn').onclick = function() {
+        modal.style.display = 'none';
+        handleDownload(item.id);
+    };
+
+    modal.style.display = 'flex';
 }
