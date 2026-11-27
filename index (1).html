@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="og6FeBb6OchdvgFyNtK5Zou97V8IQocQrxjziH6Pafs" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <title>Daelan's Downloadable Items</title>
+    <link rel="stylesheet" href="style.css">
+    <link class="icon" type="image/png" href="gem192.png">
+    <link rel="manifest" href="./manifest.json">
+
+    <script>
+    if ('serviceWorker' in navigator) {
+      // 1. Show last saved version immediately while checking
+      const savedVersion = localStorage.getItem('app-debug-version');
+      if (savedVersion) {
+        window.addEventListener('DOMContentLoaded', () => {
+          const verEl = document.getElementById('debug-version');
+          if (verEl) verEl.innerText = savedVersion;
+        });
+      }
+
+      // Helper to ask the active Service Worker for its exact CACHE_NAME
+      function syncVersionFromSW(worker) {
+        if (!worker) return;
+        worker.postMessage({ type: 'GET_VERSION' });
+      }
+
+      // 2. Register Service Worker and track state changes live
+      navigator.serviceWorker.register('./sw.js?update=' + Date.now())
+        .then((registration) => {
+          const statusEl = document.getElementById('debug-status');
+
+          if (registration.active) {
+            if (statusEl) {
+              statusEl.innerText = "Running";
+              statusEl.style.color = "#00C851";
+            }
+            syncVersionFromSW(registration.active);
+          }
+
+          // Listen for new updates installing in the background
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (!newWorker) return;
+
+            if (statusEl) {
+              statusEl.innerText = "Downloading...";
+              statusEl.style.color = "#33b5e5";
+            }
+
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'activated') {
+                if (statusEl) {
+                  statusEl.innerText = "Updated Live!";
+                  statusEl.style.color = "#00ff00";
+                }
+                syncVersionFromSW(newWorker);
+              }
+            });
+          });
+        })
+        .catch(() => {
+          const statusEl = document.getElementById('debug-status');
+          if (statusEl) {
+            statusEl.innerText = "Error";
+            statusEl.style.color = "#ff4444";
+          }
+        });
+
+      // 3. Receive version reply from sw.js and lock it in localStorage
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'VERSION_UPDATE') {
+          const verEl = document.getElementById('debug-version');
+          if (verEl) verEl.innerText = event.data.version;
+          localStorage.setItem('app-debug-version', event.data.version);
+        }
+      });
+    }
+
+    // Device & Mode Detection
+    window.addEventListener('DOMContentLoaded', () => {
+      const ua = navigator.userAgent;
+      let os = "Unknown OS";
+      if (/android/i.test(ua)) os = "Android";
+      else if (/iPad|iPhone|iPod/.test(ua)) os = "iOS";
+      else if (/Win/.test(ua)) os = "Windows";
+      else if (/Mac/.test(ua)) os = "MacOS";
+
+      const isApp = window.matchMedia('(display-mode: standalone)').matches || !!window.cordova || /; wv\)/.test(ua);
+      const mode = isApp ? "Installed App" : "Browser";
+      const deviceEl = document.getElementById('debug-device');
+      if (deviceEl) deviceEl.innerText = `${os} (${mode})`;
+    });
+    </script>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="resetFilters()">
+                <img src="gem192.png" alt="Daelan's Diamond" class="logo-icon">
+                <div class="logo-text">
+                    <span class="logo-name">Daelan's</span>
+                    <span class="logo-tag">Downloadable Items</span>
+                </div>
+            </a>
+
+            <div class="nav-links">
+                <a href="#" class="nav-link active" onclick="resetFilters()">Home</a>
+                <a href="#" class="nav-link" onclick="alert('Server uploads are locked for release builds.')">Upload</a>
+            </div>
+
+            <div class="nav-actions">
+                <!-- Categories Wrapper -->
+                <div class="dropdown-wrapper">
+                    <button class="categories-btn" id="categories-toggle-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        Categories
+                    </button>
+                    <!-- Categories Dropdown Menu -->
+                    <div class="categories-menu" id="categories-menu">
+                        <div class="cat-group">
+                            <span class="cat-heading">Source Type</span>
+                            <button onclick="filterBySource('all')">All Sources</button>
+                            <button onclick="filterBySource('Local')">Local (Offline Ready)</button>
+                            <button onclick="filterBySource('Server')">Server (Wi-Fi / Data)</button>
+                        </div>
+                        <div class="cat-divider"></div>
+                        <div class="cat-group">
+                            <span class="cat-heading">File Types</span>
+                            <button onclick="filterByFileType('all')">All File Types</button>
+                            <button onclick="filterByFileType('Media')">Media</button>
+                            <button onclick="filterByFileType('Documents')">Documents</button>
+                            <button onclick="filterByFileType('Programming')">Programming</button>
+                            <button onclick="filterByFileType('Text')">Text</button>
+                            <button onclick="filterByFileType('Programs')">Programs</button>
+                            <button onclick="filterByFileType('Archives')">Archives</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="my-downloads-btn" id="open-mydownloads-btn">My Downloads</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">Daelan's<br>Downloadable Items</h1>
+        <div class="search-bar">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" placeholder="Search for Downloadable Items" id="search-input">
+        </div>
+        <div id="active-filter-bar" class="active-filter-bar" style="display: none;">
+            <span id="filter-label">Showing: All</span>
+            <button onclick="resetFilters()">Clear Filter ✕</button>
+        </div>
+                        <!-- Main Install Trigger Button -->
+        <button id="custom-install-picker-btn" type="button" onclick="document.getElementById('install-picker-modal').style.display='flex'" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; padding:12px 22px; font-size:15px; font-weight:600; color:#FFFFFF; background:#2563EB; border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.4);">
+          <span>Install Daelan's Downloadable Items</span>
+        </button>
+
+                <!-- Install Platform Picker Modal -->
+        <div id="install-picker-modal" onclick="this.style.display='none'" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.82); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+          <div onclick="event.stopPropagation()" style="background:#0F172A; border:1px solid rgba(255,255,255,0.14); border-radius:16px; width:100%; max-width:380px; padding:20px; text-align:left; box-shadow:0 20px 40px rgba(0,0,0,0.65);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <h3 style="margin:0; font-size:17px; color:#F8FAFC;">Choose Install Version</h3>
+              <button type="button" onclick="document.getElementById('install-picker-modal').style.display='none'" style="background:none; border:none; color:#94A3B8; font-size:18px; cursor:pointer;">✕</button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <!-- 1. Chrome / Edge PWA -->
+              <button id="opt-pwa-install" type="button" onclick="triggerPWAInstall()" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(56,189,248,0.4); border-radius:10px; color:#F8FAFC; cursor:pointer; text-align:left; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="display:inline-flex; width:20px; height:20px; color:#38BDF8; flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                      <path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z" />
+                    </svg>
+                  </span>
+                  <div>
+                    <div style="font-weight:600; font-size:14px;">Chrome / Edge Web App (PWA)</div>
+                    <div id="pwa-subtext" style="font-size:11px; color:#94A3B8; margin-top:2px;">Instant install • No Windows Defender warning</div>
+                  </div>
+                </div>
+                <span style="font-size:10px; font-weight:700; color:#38BDF8; flex-shrink:0;">RECOMMENDED</span>
+              </button>
+
+              <!-- 2. Android APK (Direct ://githubusercontent.com) -->
+              <a href="https://://githubusercontent.com/daecoderlover/Daelan-s-Downloadable-Items/main/DaelansDownloads.apk" download="DaelansDownloads.apk" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="display:inline-flex; width:20px; height:20px; color:#34D399; flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                      <path d="M10.5 18.75a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z" />
+                      <path fill-rule="evenodd" d="M8.625.75A3.375 3.375 0 0 0 5.25 4.125v15.75a3.375 3.375 0 0 0 3.375 3.375h6.75a3.375 3.375 0 0 0 3.375-3.375V4.125A3.375 3.375 0 0 0 15.375.75h-6.75ZM7.5 4.125C7.5 3.504 8.004 3 8.625 3H9.75v.375c0 .621.504 1.125 1.125 1.125h2.25c.621 0 1.125-.504 1.125-1.125V3h1.125c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125h-6.75A1.125 1.125 0 0 1 7.5 19.875V4.125Z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                  <div>
+                    <div style="font-weight:600; font-size:14px;">Android APK</div>
+                    <div style="font-size:11px; color:#94A3B8; margin-top:2px;">Native Cordova Android package (.apk)</div>
+                  </div>
+                </div>
+                <span style="display:inline-flex; width:16px; height:16px; color:#38BDF8;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                    <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+              </a>
+
+              <!-- 3. Computer EXE (Direct ://githubusercontent.com) -->
+              <a href="https://://githubusercontent.com/daecoderlover/Daelan-s-Downloadable-Items/main/DaelansDownloads.exe" download="DaelansDownloads.exe" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:#1E293B; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#F8FAFC; text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="display:inline-flex; width:20px; height:20px; color:#60A5FA; flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                      <path fill-rule="evenodd" d="M2.25 5.25a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3V15a3 3 0 0 1-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 0 1-.53 1.28h-9a.75.75 0 0 1-.53-1.28l.621-.622a2.25 2.25 0 0 0 .659-1.59V18h-3a3 3 0 0 1-3-3V5.25Zm1.5 0v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5Z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                  <div>
+                    <div style="font-weight:600; font-size:14px;">Computer EXE</div>
+                    <div style="font-size:11px; color:#94A3B8; margin-top:2px;">Desktop executable (.exe)</div>
+                  </div>
+                </div>
+                <span style="display:inline-flex; width:16px; height:16px; color:#38BDF8;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+                    <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+              </a>
+
+              <!-- 4. Future Windows MSI -->
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:rgba(30,41,59,0.45); border:1px dashed rgba(255,255,255,0.12); border-radius:10px; color:#64748B;">
+                <div>
+                  <div style="font-weight:600; font-size:14px;">Windows Installer (MSI)</div>
+                  <div style="font-size:11px; margin-top:2px;">Enterprise Windows package (.msi)</div>
+                </div>
+                <span style="font-size:10px; font-weight:700; padding:3px 7px; border-radius:6px; background:rgba(148,163,184,0.15); color:#94A3B8;">FUTURE</span>
+              </div>
+
+              <!-- 5. Future webOS IPK -->
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding:12px 14px; background:rgba(30,41,59,0.45); border:1px dashed rgba(255,255,255,0.12); border-radius:10px; color:#64748B;">
+                <div>
+                  <div style="font-weight:600; font-size:14px;">webOS App Package (IPK)</div>
+                  <div style="font-size:11px; margin-top:2px;">Smart TV / webOS package (.ipk)</div>
+                </div>
+                <span style="font-size:10px; font-weight:700; padding:3px 7px; border-radius:6px; background:rgba(148,163,184,0.15); color:#94A3B8;">FUTURE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="app-quick-actions" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:16px 0 24px;">
+  <!-- Refresh: Hidden before install, appears ONLY when installed (APK / PWA / IPK) -->
+  <button id="btn-installed-refresh" type="button" onclick="customRefreshApp(this)" style="display:none; align-items:center; gap:6px; padding:7px 14px; font-size:12px; font-weight:600; color:#E2E8F0; background:#1E293B; border:1px solid rgba(255,255,255,0.15); border-radius:8px; cursor:pointer;">
+    <span class="btn-icon" style="display:inline-flex; width:15px; height:15px; transition:transform 0.5s ease;">
+      <svg xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:100%; height:100%;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+      </svg>
+    </span>
+    <span>Refresh</span>
+  </button>
+
+  <!-- Clear Cache: Always visible on BOTH website and installed apps -->
+  <button id="btn-clear-cache" type="button" onclick="customClearAppCache()" style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:12px; font-weight:600; color:#FCA5A5; background:#1E293B; border:1px solid rgba(248,113,113,0.3); border-radius:8px; cursor:pointer;">
+    <span class="btn-icon" style="display:inline-flex; width:15px; height:15px;">
+      <svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%;">
+        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
+      </svg>
+    </span>
+    <span>Clear Cache</span>
+  </button>
+
+  <!-- Updates: Always visible across Website, APK, and future IPK -->
+  <a id="btn-app-updates" href="https://github.com/daecoderlover/Daelan-s-Downloadable-Items/" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:12px; font-weight:600; color:#38BDF8; background:#1E293B; border:1px solid rgba(56,189,248,0.35); border-radius:8px; text-decoration:none;">
+    <span class="btn-icon" style="display:inline-flex; width:15px; height:15px;">
+      <svg xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:100%; height:100%;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+      </svg>
+    </span>
+    <span>Updates</span>
+  </a>
+
+  <script>
+    (function setupInstallStateButtons() {
+      const refreshBtn = document.getElementById('btn-installed-refresh');
+      if (!refreshBtn) return;
+
+      const isCordovaOrWebView = !!(
+        window.cordova ||
+        window.PhoneGap ||
+        window.phonegap ||
+        /; wv\)/i.test(navigator.userAgent) ||
+        (document.URL.indexOf('http://') === -1 && document.URL.indexOf('https://') === -1)
+      );
+      const isStandalonePWA =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+
+            if (isCordovaOrWebView || isStandalonePWA) {
+        refreshBtn.style.display = 'inline-flex';
+        const installBtn = document.getElementById('custom-install-picker-btn');
+        if (installBtn) installBtn.style.display = 'none';
+            }
+
+      window.addEventListener('beforeinstallprompt', () => {
+        if (!isCordovaOrWebView && !isStandalonePWA) {
+          refreshBtn.style.display = 'none';
+        }
+      });
+
+      window.addEventListener('appinstalled', () => {
+        refreshBtn.style.display = 'inline-flex';
+      });
+    })();
+
+    async function customRefreshApp(btn) {
+      if (btn) {
+        btn.disabled = true;
+        const icon = btn.querySelector('.btn-icon');
+        const label = btn.querySelector('span:last-child');
+        if (icon) icon.style.transform = 'rotate(360deg)';
+        if (label) label.textContent = 'Refreshing...';
+      }
+
+      try {
+        if ('serviceWorker' in navigator) {
+          const reg = await navigator.serviceWorker.getRegistration();
+          if (reg) await reg.update();
+        }
+      } catch (e) {
+        console.warn('SW update check skipped:', e);
+      }
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    }
+
+    async function customClearAppCache() {
+      if (!confirm('Clear cached app files and reload latest version? (Your saved Local items stay safe)')) return;
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(
+          keys.filter(k => k !== 'daelan-offline-locals-v1').map(k => caches.delete(k))
+        );
+      }
+      window.location.reload();
+    }
+  </script>
+        </div>
+    </section>
+
+    <!-- Items Grid -->
+    <section class="items-section">
+        <div class="grid-container" id="items-grid">
+            <!-- Items loaded by script.js -->
+        </div>
+    </section>
+
+    <!-- My Downloads Modal -->
+    <div id="mydownloads-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>My Downloads</h2>
+                <button class="close-modal-btn" id="close-mydownloads-btn">✕</button>
+            </div>
+            <div class="modal-tabs">
+                <button class="tab-btn active" id="tab-downloads" onclick="switchModalTab('downloads')">Downloads History</button>
+                <button class="tab-btn" id="tab-locals" onclick="switchModalTab('locals')">Saved Locals (Offline)</button>
+            </div>
+            <div class="modal-body" id="modal-list-container">
+                <!-- Populated dynamically by script.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Debug Info Panel -->
+    <div id="debug-panel">
+        [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.4.2 (Beta)</span><br>
+        [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
+    </div>
+
+<script>
+let deferredInstallPrompt = null;
+const installButton = document.getElementById('install-app-btn');
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  installButton.style.display = 'block';
+});
+
+installButton.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installButton.style.display = 'none';
+});
+</script>
+<script>
+  window.deferredInstallPrompt = window.deferredInstallPrompt || null;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    window.deferredInstallPrompt = e;
+    const sub = document.getElementById('pwa-subtext');
+    if (sub) sub.textContent = 'Ready for 1-tap instant install!';
+  });
+
+  async function triggerPWAInstall() {
+    const promptEvent = window.deferredInstallPrompt || (typeof deferredPrompt !== 'undefined' ? deferredPrompt : null);
+    if (promptEvent) {
+      promptEvent.prompt();
+      const { outcome } = await promptEvent.userChoice;
+      if (outcome === 'accepted') {
+        window.deferredInstallPrompt = null;
+        document.getElementById('install-picker-modal').style.display = 'none';
+      }
+    } else {
+      alert('To install the Web App (PWA):\n• Android Chrome: Tap ⋮ Menu (top right) -> "Add to Home screen" / "Install app".\n• Windows Chrome / Edge: Click the Install icon in the address bar.');
+    }
+  }
+</script>
+<script src="script.js"></script>
+<script src="loader-hook.js"></script>
+</body>
+</html>
