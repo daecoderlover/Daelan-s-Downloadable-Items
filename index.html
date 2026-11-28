@@ -247,6 +247,44 @@
         </div>
     </nav>
 
+     <!-- Upload Page View (Shares Top Navbar) -->
+    <section id="upload-view" style="display:none; padding:40px 16px 60px; justify-content:center; align-items:center;">
+      <div style="width:100%; max-width:400px; background:#0F172A; border:1px solid rgba(255,255,255,0.14); border-radius:18px; padding:28px 22px; text-align:center; box-shadow:0 20px 45px rgba(0,0,0,0.65);">
+        <!-- Top "In Development" Pill + Bold Yellow/Black BETA Logo -->
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(250,204,21,0.14); border:1px solid rgba(250,204,21,0.35); padding:6px 12px; border-radius:999px; margin-bottom:16px;">
+          <span style="background:#FACC15; color:#000000; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; letter-spacing:0.5px;">BETA</span>
+          <span style="font-size:13px; font-weight:700; color:#FACC15;">In Development</span>
+        </div>
+
+        <h2 style="font-size:20px; font-weight:700; color:#F8FAFC; margin:0 0 8px;">Upload Files</h2>
+        <p style="font-size:13px; color:#94A3B8; line-height:1.5; margin:0 0 20px;">
+          Direct browser uploads are disabled while the upload system is still in development.
+        </p>
+
+        <!-- Disabled Upload Placeholder -->
+        <div aria-disabled="true" style="border:1.5px dashed rgba(148,163,184,0.3); background:rgba(30,41,59,0.45); border-radius:12px; padding:20px 16px; margin-bottom:22px; color:#64748B; font-size:13px; cursor:not-allowed; user-select:none;">
+          <svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:28px; height:28px; margin-bottom:8px; color:#64748B;">
+            <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clip-rule="evenodd" />
+          </svg>
+          <div>File Uploads Locked (Cannot Upload Yet)</div>
+        </div>
+
+        <!-- Yellow "Home" Button + Green #1F883D "Github" Button -->
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <button type="button" onclick="showHomeView()" style="flex:1; min-width:130px; display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:11px 16px; background-color:#FACC15; color:#000000; font-size:14px; font-weight:700; border:none; border-radius:10px; cursor:pointer;">
+            Home
+          </button>
+
+          <a href="https://github.com" target="_blank" rel="noopener" style="flex:1; min-width:130px; display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:11px 16px; background-color:#1F883D; color:#FFFFFF; font-size:14px; font-weight:700; border:none; border-radius:10px; text-decoration:none; cursor:pointer;">
+            <span>Github</span>
+            <svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px; flex-shrink:0;">
+              <path fill-rule="evenodd" d="M15.75 2.25H21a.75.75 0 0 1 .75.75v5.25a.75.75 0 0 1-1.5 0V4.81L8.03 17.03a.75.75 0 0 1-1.06-1.06L19.19 3.75h-3.44a.75.75 0 0 1 0-1.5Zm-10.5 4.5a1.5 1.5 0 0 0-1.5 1.5v10.5a1.5 1.5 0 0 0 1.5 1.5h10.5a1.5 1.5 0 0 0 1.5-1.5V10.5a.75.75 0 0 1 1.5 0v8.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V8.25a3 3 0 0 1 3-3h8.25a.75.75 0 0 1 0 1.5H5.25Z" clip-rule="evenodd" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+    
     <!-- Hero Section -->
     <section class="hero">
         <h1 class="hero-title">Daelan's<br>Downloadable Items</h1>
