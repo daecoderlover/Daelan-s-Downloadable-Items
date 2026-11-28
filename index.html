@@ -187,6 +187,20 @@
                         <span style="background:#FACC15; color:#000000; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; letter-spacing:0.4px;">BETA</span>
                     </button>
                 </div>
+
+                <script>
+                  function toggleMainNavMenu(e) {
+                    if (e) e.stopPropagation();
+                    const menu = document.getElementById('main-hamburger-menu');
+                    if (!menu) return;
+                    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+                  }
+
+                  document.addEventListener('click', () => {
+                    const menu = document.getElementById('main-hamburger-menu');
+                    if (menu) menu.style.display = 'none';
+                  });
+                </script>
              </div>
         <div class="nav-container">
             <a href="#" class="logo" onclick="resetFilters()">
@@ -466,7 +480,7 @@
     <!-- Floating Debug Info Panel -->
     <div id="debug-panel">
         [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
-        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.4.4</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.4.5</span><br>
         [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
     </div>
 
