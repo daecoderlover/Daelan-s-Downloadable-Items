@@ -169,25 +169,25 @@
 
                 <!-- Hamburger Dropdown (Home + Upload [BETA]) -->
                 <div id="main-hamburger-menu" onclick="event.stopPropagation()" style="display:none; position:absolute; top:44px; left:0; background:#0F172A; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px; min-width:190px; z-index:1000; box-shadow:0 12px 28px rgba(0,0,0,0.65);">
-                    <a href="#" onclick="resetFilters(); document.getElementById('main-hamburger-menu').style.display='none';" style="display:flex; align-items:center; gap:8px; padding:9px 12px; color:#F8FAFC; text-decoration:none; font-size:14px; font-weight:600; border-radius:8px;">
-                        <svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px; color:#38BDF8;">
+                    <button type="button" onclick="resetFilters(); document.getElementById('main-hamburger-menu').style.display='none';" style="display:flex; align-items:center; gap:8px; width:100%; background:none; border:none; padding:9px 12px; color:#F8FAFC; font-size:14px; font-weight:600; border-radius:8px; cursor:pointer; text-align:left;">
+                        <svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px; color:#38BDF8; flex-shrink:0;">
                             <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
                             <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
                         </svg>
                         <span>Home</span>
-                    </a>
+                    </button>
 
-                    <a href="#" onclick="document.getElementById('main-hamburger-menu').style.display='none'; alert('Server uploads are locked for release builds.');" style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 12px; color:#F8FAFC; text-decoration:none; font-size:14px; font-weight:600; border-radius:8px;">
+                    <button type="button" onclick="document.getElementById('main-hamburger-menu').style.display='none'; alert('Server uploads are locked for release builds.');" style="display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; background:none; border:none; padding:9px 12px; color:#F8FAFC; font-size:14px; font-weight:600; border-radius:8px; cursor:pointer; text-align:left;">
                         <span style="display:inline-flex; align-items:center; gap:8px;">
-                            <svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px; color:#38BDF8;">
+                            <svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" style="width:16px; height:16px; color:#38BDF8; flex-shrink:0;">
                                 <path fill-rule="evenodd" d="M11.47 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06l-3.22-3.22V16.5a.75.75 0 0 1-1.5 0V4.81L8.03 8.03a.75.75 0 0 1-1.06-1.06l4.5-4.5ZM3 15.75a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
                             </svg>
                             <span>Upload</span>
                         </span>
                         <span style="background:#FACC15; color:#000000; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; letter-spacing:0.4px;">BETA</span>
-                    </a>
+                    </button>
                 </div>
-            </div>
+             </div>
         <div class="nav-container">
             <a href="#" class="logo" onclick="resetFilters()">
                 <img src="gem192.png" alt="Daelan's Diamond" class="logo-icon">
