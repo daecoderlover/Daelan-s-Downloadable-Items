@@ -6,11 +6,11 @@ on:
       version_name:
         description: 'Version Name shown in Android App Info (numbers only, e.g., 1.3.7)'
         required: true
-        default: '1.3.7'
+        default: '1.4.8'
       version_code:
         description: 'Version Code integer (must increase every build, e.g., 12)'
         required: true
-        default: '12'
+        default: '15'
 
 permissions:
   contents: write
@@ -49,6 +49,18 @@ jobs:
       - name: Install Cordova
         run: npm install -g cordova
 
+      - name: Disable Cordova Native Splash Screen
+        run: |
+          cordova plugin rm cordova-plugin-splashscreen || true
+          node -e '
+            const fs = require("fs");
+            let xml = fs.readFileSync("config.xml", "utf8");
+            if (!xml.includes("SplashScreenDelay")) {
+              xml = xml.replace("</widget>", "    <preference name=\"SplashScreenDelay\" value=\"0\" />\n    <preference name=\"AutoHideSplashScreen\" value=\"true\" />\n</widget>");
+              fs.writeFileSync("config.xml", xml);
+            }
+          '
+          
       - name: Create & Build Android Wrapper
         run: |
           CLEAN_VERSION=$(echo "${{ github.event.inputs.version_name }}" | grep -oE '[0-9]+(\.[0-9]+)*' | head -n 1)
