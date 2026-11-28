@@ -97,7 +97,65 @@
     </script>
 </head>
 <body>
+  <!-- Startup Screen (Static Logos & Title + Smooth Blue Progress Bar) -->
+  <div id="startup-screen" style="position:fixed; inset:0; background:#0B1120; color:#F8FAFC; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:99999; padding:24px; text-align:center;">
+    <!-- Center App Logo (gem192.png for Phone, gem512.png for Computer) -->
+    <img id="startup-main-logo" src="gem192.png" alt="Daelan's Downloadable Items" style="width:110px; height:110px; object-fit:contain; margin-bottom:14px;" />
 
+    <!-- App Title -->
+    <div style="font-size:18px; font-weight:700; color:#F8FAFC; margin-bottom:14px;">
+      Daelan's Downloadable Items
+    </div>
+
+    <!-- Small Platform Icon Below Title (cordova.png for Phone, webview.png for Computer) -->
+    <img id="startup-platform-logo" src="Daelan_0_web/assets/cordova.png" alt="Platform" style="width:38px; height:38px; object-fit:contain; margin-bottom:20px;" />
+
+    <!-- Blue Progress Bar (#2584FF Fill on #00D9FF Track with Smooth Transition) -->
+    <div style="width:240px; height:6px; background-color:rgba(0, 217, 255, 0.25); border-radius:999px; overflow:hidden; margin-bottom:12px;">
+      <div id="startup-progress-fill" style="width:0%; height:100%; background-color:#2584FF; border-radius:999px; transition: width 0.2s ease-out;"></div>
+    </div>
+
+    <!-- 0-100% Status -->
+    <div id="startup-percent-text" style="font-size:15px; font-weight:600; color:#2584FF; margin-bottom:6px;">0%</div>
+    <div id="startup-status-text" style="font-size:13px; color:#00D9FF;">Starting Daelan's Downloadable Items...</div>
+
+    <script>
+      (function initStartupScreen() {
+        const isDesktop = /Windows|Macintosh|Linux x86_64/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+        const mainLogo = document.getElementById('startup-main-logo');
+        const platformLogo = document.getElementById('startup-platform-logo');
+
+        if (isDesktop) {
+          if (mainLogo) mainLogo.src = 'gem512.png';
+          if (platformLogo) platformLogo.src = 'Daelan_0_web/assets/webview.png';
+        } else {
+          if (mainLogo) mainLogo.src = 'gem192.png';
+          if (platformLogo) platformLogo.src = 'Daelan_0_web/assets/cordova.png';
+        }
+
+        const fill = document.getElementById('startup-progress-fill');
+        const percentText = document.getElementById('startup-percent-text');
+        const statusText = document.getElementById('startup-status-text');
+        const screen = document.getElementById('startup-screen');
+
+        let pct = 0;
+        const step = setInterval(() => {
+          pct += 25;
+          if (pct > 100) pct = 100;
+          if (fill) fill.style.width = pct + '%';
+          if (percentText) percentText.textContent = pct + '%';
+          if (pct === 100 && statusText) statusText.textContent = 'Ready!';
+
+          if (pct >= 100) {
+            clearInterval(step);
+            setTimeout(() => {
+              if (screen) screen.style.display = 'none';
+            }, 250);
+          }
+        }, 220);
+      })();
+    </script>
+  </div>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -383,7 +441,7 @@
     <!-- Floating Debug Info Panel -->
     <div id="debug-panel">
         [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
-        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.4.2 (Beta)</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.4.3</span><br>
         [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
     </div>
 
