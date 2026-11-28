@@ -122,6 +122,7 @@
     <script>
       (function initStartupScreen() {
         const isDesktop = /Windows|Macintosh|Linux x86_64/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+        const isCordova = !!(window.cordova || /; wv\)/i.test(navigator.userAgent));
         const mainLogo = document.getElementById('startup-main-logo');
         const platformLogo = document.getElementById('startup-platform-logo');
 
@@ -138,21 +139,38 @@
         const statusText = document.getElementById('startup-status-text');
         const screen = document.getElementById('startup-screen');
 
-        let pct = 0;
-        const step = setInterval(() => {
-          pct += 25;
-          if (pct > 100) pct = 100;
-          if (fill) fill.style.width = pct + '%';
-          if (percentText) percentText.textContent = pct + '%';
-          if (pct === 100 && statusText) statusText.textContent = 'Ready!';
+        let started = false;
+        function startProgress() {
+          if (started) return;
+          started = true;
 
-          if (pct >= 100) {
-            clearInterval(step);
-            setTimeout(() => {
-              if (screen) screen.style.display = 'none';
-            }, 250);
-          }
-        }, 220);
+          let pct = 0;
+          const step = setInterval(() => {
+            pct += 25;
+            if (pct > 100) pct = 100;
+            if (fill) fill.style.width = pct + '%';
+            if (percentText) percentText.textContent = pct + '%';
+            if (pct === 100 && statusText) statusText.textContent = 'Ready!';
+
+            if (pct >= 100) {
+              clearInterval(step);
+              setTimeout(() => {
+                if (screen) screen.style.display = 'none';
+              }, 250);
+            }
+          }, 220);
+        }
+
+        if (isCordova) {
+          // Wait for Cordova native splash to finish before starting 0% -> 100%
+          document.addEventListener('deviceready', () => {
+            setTimeout(startProgress, 350);
+          }, false);
+          // Safety fallback in case deviceready already fired
+          setTimeout(startProgress, 1200);
+        } else {
+          startProgress();
+        }
       })();
     </script>
   </div>
@@ -536,7 +554,7 @@
     <!-- Floating Debug Info Panel -->
     <div id="debug-panel">
         [DEBUG] Status: <span id="debug-status" style="color: #ff9900;">Checking...</span><br>
-        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.4.6</span><br>
+        [DEBUG] Version: <span id="debug-version" style="color: #fff;">v1.4.7</span><br>
         [DEBUG] Device: <span id="debug-device" style="color: #00d8ff;">Detecting...</span>
     </div>
 
